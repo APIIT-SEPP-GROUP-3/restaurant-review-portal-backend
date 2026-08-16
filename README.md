@@ -26,7 +26,7 @@ Before running the project, make sure the following are installed:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/<YOUR-GITHUB-USERNAME>/restaurant-review-portal-backend.git
+git clone https://github.com/SanjulaDilky/restaurant-review-portal-backend.git
 ```
 
 ### 2. Navigate to the Project
