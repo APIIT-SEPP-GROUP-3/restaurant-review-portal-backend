@@ -1,6 +1,6 @@
 # Restaurant Review Portal - Backend
 
-Backend REST API for the **Restaurant Review Portal**, developed as part of the MSc group project.
+Backend REST API for the **Restaurant Review Portal - Group 3**, developed as part of the MSc group project.
 
 The backend provides the business logic, API endpoints, authentication, restaurant management, review management, and database communication required by the Restaurant Review Portal frontend.
 
