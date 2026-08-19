@@ -1,0 +1,245 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Role {
+  id          Int      @id @default(autoincrement())
+  roleName    String   @unique @map("role_name")
+  description String?
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  users User[]
+
+  @@map("role")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  firstName    String   @map("first_name")
+  lastName     String   @map("last_name")
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  roleId       Int      @map("role_id")
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  role        Role            @relation(fields: [roleId], references: [id])
+  restaurants Restaurant[]
+  reviews     Review[]
+  comments    ReviewComment[]
+
+  moderatedReviews  Review[]        @relation("ReviewModerator")
+  moderatedComments ReviewComment[] @relation("CommentModerator")
+
+  @@map("user")
+}
+
+model Restaurant {
+  id           Int              @id @default(autoincrement())
+  ownerId      Int              @map("owner_id")
+  name         String
+  description  String?
+  address      String
+  city         String
+  phone        String?
+  email        String?
+  website      String?
+  openingHours String?          @map("opening_hours")
+  status       RestaurantStatus @default(ACTIVE)
+  createdAt    DateTime         @default(now()) @map("created_at")
+  updatedAt    DateTime         @updatedAt @map("updated_at")
+
+  owner          User                        @relation(fields: [ownerId], references: [id])
+  categories     RestaurantCategoryMapping[]
+  menuCategories MenuCategory[]
+  menuItems      MenuItem[]
+  images         RestaurantImage[]
+  reviews        Review[]
+
+  @@map("restaurant")
+}
+
+model RestaurantCategory {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  restaurants RestaurantCategoryMapping[]
+
+  @@map("restaurant_category")
+}
+
+model RestaurantCategoryMapping {
+  restaurantId Int      @map("restaurant_id")
+  categoryId   Int      @map("category_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  restaurant Restaurant         @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  category   RestaurantCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([restaurantId, categoryId])
+  @@map("restaurant_category_mapping")
+}
+
+model MenuCategory {
+  id           Int      @id @default(autoincrement())
+  restaurantId Int      @map("restaurant_id")
+  name         String
+  displayOrder Int      @default(0) @map("display_order")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  menuItems  MenuItem[]
+
+  @@map("menu_category")
+}
+
+model MenuItem {
+  id             Int      @id @default(autoincrement())
+  restaurantId   Int      @map("restaurant_id")
+  menuCategoryId Int      @map("menu_category_id")
+  name           String
+  description    String?
+  price          Decimal  @db.Decimal(10, 2)
+  isAvailable    Boolean  @default(true) @map("is_available")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  restaurant   Restaurant      @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  menuCategory MenuCategory    @relation(fields: [menuCategoryId], references: [id], onDelete: Cascade)
+  images       MenuItemImage[]
+  reviews      Review[]
+
+  @@map("menu_item")
+}
+
+model RestaurantImage {
+  id           Int      @id @default(autoincrement())
+  restaurantId Int      @map("restaurant_id")
+  imageUrl     String   @map("image_url")
+  altText      String?  @map("alt_text")
+  isPrimary    Boolean  @default(false) @map("is_primary")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@map("restaurant_image")
+}
+
+model MenuItemImage {
+  id         Int      @id @default(autoincrement())
+  menuItemId Int      @map("menu_item_id")
+  imageUrl   String   @map("image_url")
+  altText    String?  @map("alt_text")
+  isPrimary  Boolean  @default(false) @map("is_primary")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  menuItem MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
+
+  @@map("menu_item_image")
+}
+
+model Review {
+  id               Int          @id @default(autoincrement())
+  userId           Int          @map("user_id")
+  restaurantId     Int          @map("restaurant_id")
+  menuItemId       Int?         @map("menu_item_id")
+  title            String?
+  reviewText       String       @map("review_text")
+  overallRating    Decimal?     @map("overall_rating") @db.Decimal(3, 2)
+  moderationStatus ReviewStatus @default(PENDING) @map("moderation_status")
+  moderatedBy      Int?         @map("moderated_by")
+  moderatedAt      DateTime?    @map("moderated_at")
+  rejectionReason  String?      @map("rejection_reason")
+  createdAt        DateTime     @default(now()) @map("created_at")
+  updatedAt        DateTime     @updatedAt @map("updated_at")
+
+  user       User       @relation(fields: [userId], references: [id])
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id])
+  menuItem   MenuItem?  @relation(fields: [menuItemId], references: [id])
+  moderator  User?      @relation("ReviewModerator", fields: [moderatedBy], references: [id])
+
+  ratings  ReviewRating[]
+  comments ReviewComment[]
+
+  @@map("review")
+}
+
+model RatingType {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique
+  description  String?
+  isActive     Boolean  @default(true) @map("is_active")
+  displayOrder Int      @default(0) @map("display_order")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  reviewRatings ReviewRating[]
+
+  @@map("rating_type")
+}
+
+model ReviewRating {
+  id           Int      @id @default(autoincrement())
+  reviewId     Int      @map("review_id")
+  ratingTypeId Int      @map("rating_type_id")
+  ratingValue  Int      @map("rating_value")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  review     Review     @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  ratingType RatingType @relation(fields: [ratingTypeId], references: [id])
+
+  @@unique([reviewId, ratingTypeId])
+  @@map("review_rating")
+}
+
+model ReviewComment {
+  id               Int           @id @default(autoincrement())
+  reviewId         Int           @map("review_id")
+  userId           Int           @map("user_id")
+  parentCommentId  Int?          @map("parent_comment_id")
+  commentText      String        @map("comment_text")
+  moderationStatus CommentStatus @default(PENDING) @map("moderation_status")
+  moderatedBy      Int?          @map("moderated_by")
+  moderatedAt      DateTime?     @map("moderated_at")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+
+  review    Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user      User   @relation(fields: [userId], references: [id])
+  moderator User?  @relation("CommentModerator", fields: [moderatedBy], references: [id])
+
+  parentComment ReviewComment?  @relation("CommentReplies", fields: [parentCommentId], references: [id])
+  replies       ReviewComment[] @relation("CommentReplies")
+
+  @@map("review_comment")
+}
+
+enum RestaurantStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum CommentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
