@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { loginSchema, registerSchema } from "../validators/auth.validator.js";
-import { loginUser, registerUser } from "../services/auth.service.js";
+import { loginUser, registerUser,getCurrentUser } from "../services/auth.service.js";
+import { AuthenticatedRequest } from "../middleware/auth.middleware.js";
 
 export const register = async (
   req: Request,
@@ -62,6 +63,29 @@ export const login = async (
     res.status(400).json({
       success: false,
       message: "Unable to login",
+    });
+  }
+};
+
+export const me = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const userId = req.user!.userId;
+
+    const user = await getCurrentUser(userId);
+
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(404).json({
+      success: false,
+      message: "User not found",
     });
   }
 };
