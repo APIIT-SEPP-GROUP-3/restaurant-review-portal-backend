@@ -2,7 +2,6 @@ import prisma from "../config/prisma.js";
 import { generateToken } from "../utils/jwt.js";
 import { comparePassword, hashPassword } from "../utils/password.js";
 
-
 interface RegisterInput {
   firstName: string;
   lastName: string;
@@ -16,9 +15,11 @@ interface LoginInput {
 }
 
 export const registerUser = async (data: RegisterInput) => {
+  const email = data.email.trim().toLowerCase();
+
   const existingUser = await prisma.user.findUnique({
     where: {
-      email: data.email,
+      email,
     },
   });
 
@@ -40,9 +41,9 @@ export const registerUser = async (data: RegisterInput) => {
 
   const user = await prisma.user.create({
     data: {
-      firstName: data.firstName,
-      lastName: data.lastName,
-      email: data.email.toLowerCase(),
+      firstName: data.firstName.trim(),
+      lastName: data.lastName.trim(),
+      email,
       passwordHash,
       roleId: customerRole.id,
     },
@@ -61,9 +62,11 @@ export const registerUser = async (data: RegisterInput) => {
 };
 
 export const loginUser = async (data: LoginInput) => {
+  const email = data.email.trim().toLowerCase();
+
   const user = await prisma.user.findUnique({
     where: {
-      email: data.email.toLowerCase(),
+      email,
     },
     include: {
       role: true,
