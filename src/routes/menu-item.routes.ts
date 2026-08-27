@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   getMenuItemById,
   updateMenuItem,
+  updateMenuItemAvailability
 } from "../controllers/menu-item.controller.js";
 
 import { authenticate } from "../middleware/auth.middleware.js";
@@ -16,6 +17,13 @@ router.put(
   authenticate,
   authorizeRoles("RESTAURANT_OWNER", "ADMIN"),
   updateMenuItem
+);
+
+router.patch(
+  "/:id/availability",
+  authenticate,
+  authorizeRoles("RESTAURANT_OWNER", "ADMIN"),
+  updateMenuItemAvailability
 );
 
 export default router;

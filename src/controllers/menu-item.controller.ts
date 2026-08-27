@@ -1,11 +1,16 @@
 import { Request, Response } from "express";
 import { AuthenticatedRequest } from "../middleware/auth.middleware.js";
-import { createMenuItemSchema ,updateMenuItemSchema} from "../validators/menu-item.validator.js";
+import {
+  createMenuItemSchema,
+  updateMenuItemSchema,
+  updateMenuItemAvailabilitySchema,
+} from "../validators/menu-item.validator.js";
 import {
   createMenuItem as createMenuItemService,
   getMenuItemsByRestaurant as getMenuItemsByRestaurantService,
   getMenuItemById as getMenuItemByIdService,
-   updateMenuItem as updateMenuItemService,
+  updateMenuItem as updateMenuItemService,
+  updateMenuItemAvailability as updateMenuItemAvailabilityService,
 } from "../services/menu-item.service.js";
 
 export const createMenuItem = async (
@@ -80,7 +85,7 @@ export const createMenuItem = async (
 };
 export const getMenuItemsByRestaurant = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const restaurantId = Number(req.params.restaurantId);
@@ -93,8 +98,7 @@ export const getMenuItemsByRestaurant = async (
       return;
     }
 
-    const menuItems =
-      await getMenuItemsByRestaurantService(restaurantId);
+    const menuItems = await getMenuItemsByRestaurantService(restaurantId);
 
     res.status(200).json({
       success: true,
@@ -119,7 +123,7 @@ export const getMenuItemsByRestaurant = async (
 };
 export const getMenuItemById = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const menuItemId = Number(req.params.id);
@@ -158,7 +162,7 @@ export const getMenuItemById = async (
 
 export const updateMenuItem = async (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const menuItemId = Number(req.params.id);
@@ -177,7 +181,7 @@ export const updateMenuItem = async (
       menuItemId,
       req.user!.userId,
       req.user!.role,
-      validatedData
+      validatedData,
     );
 
     res.status(200).json({
@@ -223,6 +227,63 @@ export const updateMenuItem = async (
     res.status(400).json({
       success: false,
       message: "Unable to update menu item",
+    });
+  }
+};
+
+export const updateMenuItemAvailability = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const menuItemId = Number(req.params.id);
+
+    if (Number.isNaN(menuItemId)) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid menu item ID",
+      });
+      return;
+    }
+
+    const validatedData =
+      updateMenuItemAvailabilitySchema.parse(req.body);
+
+    const menuItem =
+      await updateMenuItemAvailabilityService(
+        menuItemId,
+        req.user!.userId,
+        req.user!.role,
+        validatedData.isAvailable
+      );
+
+    res.status(200).json({
+      success: true,
+      message: "Menu item availability updated successfully",
+      data: menuItem,
+    });
+  } catch (error: any) {
+    if (error.message === "MENU_ITEM_NOT_FOUND") {
+      res.status(404).json({
+        success: false,
+        message: "Menu item not found",
+      });
+      return;
+    }
+
+    if (error.message === "FORBIDDEN") {
+      res.status(403).json({
+        success: false,
+        message: "You are not allowed to update this menu item",
+      });
+      return;
+    }
+
+    console.error(error);
+
+    res.status(400).json({
+      success: false,
+      message: "Unable to update menu item availability",
     });
   }
 };

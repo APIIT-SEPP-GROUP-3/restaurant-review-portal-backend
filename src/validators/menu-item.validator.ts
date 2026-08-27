@@ -15,3 +15,7 @@ export const updateMenuItemSchema = z.object({
   price: z.number().positive().optional(),
   isAvailable: z.boolean().optional(),
 });
+
+export const updateMenuItemAvailabilitySchema = z.object({
+  isAvailable: z.boolean(),
+});
