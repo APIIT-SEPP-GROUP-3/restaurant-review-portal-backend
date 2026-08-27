@@ -4,6 +4,7 @@ import { createMenuItemSchema } from "../validators/menu-item.validator.js";
 import {
   createMenuItem as createMenuItemService,
   getMenuItemsByRestaurant as getMenuItemsByRestaurantService,
+  getMenuItemById as getMenuItemByIdService,
 } from "../services/menu-item.service.js";
 
 export const createMenuItem = async (
@@ -112,6 +113,44 @@ export const getMenuItemsByRestaurant = async (
     res.status(500).json({
       success: false,
       message: "Unable to fetch menu items",
+    });
+  }
+};
+export const getMenuItemById = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const menuItemId = Number(req.params.id);
+
+    if (Number.isNaN(menuItemId)) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid menu item ID",
+      });
+      return;
+    }
+
+    const menuItem = await getMenuItemByIdService(menuItemId);
+
+    if (!menuItem) {
+      res.status(404).json({
+        success: false,
+        message: "Menu item not found",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      data: menuItem,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to fetch menu item",
     });
   }
 };

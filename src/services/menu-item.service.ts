@@ -12,7 +12,7 @@ export const createMenuItem = async (
   restaurantId: number,
   userId: number,
   userRole: string,
-  data: CreateMenuItemInput
+  data: CreateMenuItemInput,
 ) => {
   const restaurant = await prisma.restaurant.findUnique({
     where: {
@@ -24,10 +24,7 @@ export const createMenuItem = async (
     throw new Error("RESTAURANT_NOT_FOUND");
   }
 
-  if (
-    userRole !== "ADMIN" &&
-    restaurant.ownerId !== userId
-  ) {
+  if (userRole !== "ADMIN" && restaurant.ownerId !== userId) {
     throw new Error("FORBIDDEN");
   }
 
@@ -56,9 +53,8 @@ export const createMenuItem = async (
     },
   });
 };
-export const getMenuItemsByRestaurant = async (
-  restaurantId: number
-) => {
+
+export const getMenuItemsByRestaurant = async (restaurantId: number) => {
   const restaurant = await prisma.restaurant.findUnique({
     where: {
       id: restaurantId,
@@ -87,5 +83,24 @@ export const getMenuItemsByRestaurant = async (
         name: "asc",
       },
     ],
+  });
+};
+
+export const getMenuItemById = async (id: number) => {
+  return prisma.menuItem.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      menuCategory: true,
+      restaurant: {
+        select: {
+          id: true,
+          name: true,
+          city: true,
+        },
+      },
+      images: true,
+    },
   });
 };

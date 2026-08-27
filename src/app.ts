@@ -4,6 +4,7 @@ import authRoutes from "./routes/auth.routes.js";
 import restaurantRoutes from "./routes/restaurant.routes.js";
 import restaurantCategoryRoutes from "./routes/restaurant-category.routes.js";
 import menuCategoryRoutes from "./routes/menu-category.routes.js";
+import menuItemRoutes from "./routes/menu-item.routes.js";
 
 const app = express();
 
@@ -24,4 +25,5 @@ app.use(
   restaurantCategoryRoutes
 );
 app.use("/api/menu-categories", menuCategoryRoutes);
+app.use("/api/menu-items", menuItemRoutes);
 export default app;
