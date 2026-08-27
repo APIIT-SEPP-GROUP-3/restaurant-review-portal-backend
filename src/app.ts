@@ -3,6 +3,7 @@ import cors from "cors";
 import authRoutes from "./routes/auth.routes.js";
 import restaurantRoutes from "./routes/restaurant.routes.js";
 import restaurantCategoryRoutes from "./routes/restaurant-category.routes.js";
+import menuCategoryRoutes from "./routes/menu-category.routes.js";
 
 const app = express();
 
@@ -22,4 +23,5 @@ app.use(
   "/api/restaurant-categories",
   restaurantCategoryRoutes
 );
+app.use("/api/menu-categories", menuCategoryRoutes);
 export default app;

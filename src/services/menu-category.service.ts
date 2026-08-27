@@ -59,3 +59,49 @@ export const getMenuCategoriesByRestaurant = async (
     },
   });
 };
+
+interface UpdateMenuCategoryInput {
+  name?: string;
+  displayOrder?: number;
+}
+
+export const updateMenuCategory = async (
+  menuCategoryId: number,
+  userId: number,
+  userRole: string,
+  data: UpdateMenuCategoryInput
+) => {
+  const menuCategory = await prisma.menuCategory.findUnique({
+    where: {
+      id: menuCategoryId,
+    },
+    include: {
+      restaurant: true,
+    },
+  });
+
+  if (!menuCategory) {
+    throw new Error("MENU_CATEGORY_NOT_FOUND");
+  }
+
+  if (
+    userRole !== "ADMIN" &&
+    menuCategory.restaurant.ownerId !== userId
+  ) {
+    throw new Error("FORBIDDEN");
+  }
+
+  return prisma.menuCategory.update({
+    where: {
+      id: menuCategoryId,
+    },
+    data: {
+      ...(data.name !== undefined && {
+        name: data.name.trim(),
+      }),
+      ...(data.displayOrder !== undefined && {
+        displayOrder: data.displayOrder,
+      }),
+    },
+  });
+};
