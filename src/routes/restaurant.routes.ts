@@ -8,7 +8,7 @@ import { authenticate } from "../middleware/auth.middleware.js";
 import { authorizeRoles } from "../middleware/role.middleware.js";
 import { updateRestaurantCategories } from "../controllers/restaurant-category.controller.js";
 import { createMenuCategory,getMenuCategoriesByRestaurant } from "../controllers/menu-category.controller.js";
-import { createMenuItem } from "../controllers/menu-item.controller.js";
+import { createMenuItem ,getMenuItemsByRestaurant} from "../controllers/menu-item.controller.js";
 
 const router = Router();
 
@@ -46,6 +46,10 @@ router.post(
   authenticate,
   authorizeRoles("RESTAURANT_OWNER", "ADMIN"),
   createMenuItem
+);
+router.get(
+  "/:restaurantId/menu-items",
+  getMenuItemsByRestaurant
 );
 
 export default router;
