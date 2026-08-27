@@ -29,3 +29,28 @@ export const createRestaurant = async (
     },
   });
 };
+
+export const getRestaurantById = async (id: number) => {
+  return prisma.restaurant.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      owner: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+      categories: {
+        include: {
+          category: true,
+        },
+      },
+      images: true,
+      menuCategories: true,
+      menuItems: true,
+    },
+  });
+};

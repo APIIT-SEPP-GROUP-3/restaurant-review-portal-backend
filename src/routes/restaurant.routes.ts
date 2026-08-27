@@ -1,5 +1,8 @@
 import { Router } from "express";
-import { createRestaurant } from "../controllers/restaurant.controller.js";
+import {
+  createRestaurant,
+  getRestaurantById,
+} from "../controllers/restaurant.controller.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 import { authorizeRoles } from "../middleware/role.middleware.js";
 
@@ -9,7 +12,8 @@ router.post(
   "/",
   authenticate,
   authorizeRoles("RESTAURANT_OWNER", "ADMIN"),
-  createRestaurant
+  createRestaurant,
 );
+router.get("/:id", getRestaurantById);
 
 export default router;
