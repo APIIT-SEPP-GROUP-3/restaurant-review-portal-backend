@@ -1,0 +1,75 @@
+import { Response } from "express";
+import { AuthenticatedRequest } from "../middleware/auth.middleware.js";
+import { createMenuItemSchema } from "../validators/menu-item.validator.js";
+import { createMenuItem as createMenuItemService } from "../services/menu-item.service.js";
+
+export const createMenuItem = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const restaurantId = Number(req.params.restaurantId);
+
+    if (Number.isNaN(restaurantId)) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid restaurant ID",
+      });
+      return;
+    }
+
+    const validatedData = createMenuItemSchema.parse(req.body);
+
+    const menuItem = await createMenuItemService(
+      restaurantId,
+      req.user!.userId,
+      req.user!.role,
+      validatedData
+    );
+
+    res.status(201).json({
+      success: true,
+      message: "Menu item created successfully",
+      data: menuItem,
+    });
+  } catch (error: any) {
+    if (error.message === "RESTAURANT_NOT_FOUND") {
+      res.status(404).json({
+        success: false,
+        message: "Restaurant not found",
+      });
+      return;
+    }
+
+    if (error.message === "MENU_CATEGORY_NOT_FOUND") {
+      res.status(404).json({
+        success: false,
+        message: "Menu category not found",
+      });
+      return;
+    }
+
+    if (error.message === "INVALID_MENU_CATEGORY") {
+      res.status(400).json({
+        success: false,
+        message: "Menu category does not belong to this restaurant",
+      });
+      return;
+    }
+
+    if (error.message === "FORBIDDEN") {
+      res.status(403).json({
+        success: false,
+        message: "You are not allowed to manage this restaurant",
+      });
+      return;
+    }
+
+    console.error(error);
+
+    res.status(400).json({
+      success: false,
+      message: "Unable to create menu item",
+    });
+  }
+};
