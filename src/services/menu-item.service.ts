@@ -104,3 +104,77 @@ export const getMenuItemById = async (id: number) => {
     },
   });
 };
+
+interface UpdateMenuItemInput {
+  menuCategoryId?: number;
+  name?: string;
+  description?: string;
+  price?: number;
+  isAvailable?: boolean;
+}
+
+export const updateMenuItem = async (
+  menuItemId: number,
+  userId: number,
+  userRole: string,
+  data: UpdateMenuItemInput
+) => {
+  const menuItem = await prisma.menuItem.findUnique({
+    where: {
+      id: menuItemId,
+    },
+    include: {
+      restaurant: true,
+    },
+  });
+
+  if (!menuItem) {
+    throw new Error("MENU_ITEM_NOT_FOUND");
+  }
+
+  if (
+    userRole !== "ADMIN" &&
+    menuItem.restaurant.ownerId !== userId
+  ) {
+    throw new Error("FORBIDDEN");
+  }
+
+  if (data.menuCategoryId !== undefined) {
+    const menuCategory = await prisma.menuCategory.findUnique({
+      where: {
+        id: data.menuCategoryId,
+      },
+    });
+
+    if (!menuCategory) {
+      throw new Error("MENU_CATEGORY_NOT_FOUND");
+    }
+
+    if (menuCategory.restaurantId !== menuItem.restaurantId) {
+      throw new Error("INVALID_MENU_CATEGORY");
+    }
+  }
+
+  return prisma.menuItem.update({
+    where: {
+      id: menuItemId,
+    },
+    data: {
+      ...(data.menuCategoryId !== undefined && {
+        menuCategoryId: data.menuCategoryId,
+      }),
+      ...(data.name !== undefined && {
+        name: data.name.trim(),
+      }),
+      ...(data.description !== undefined && {
+        description: data.description.trim(),
+      }),
+      ...(data.price !== undefined && {
+        price: data.price,
+      }),
+      ...(data.isAvailable !== undefined && {
+        isAvailable: data.isAvailable,
+      }),
+    },
+  });
+};

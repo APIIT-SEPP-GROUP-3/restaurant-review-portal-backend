@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 import { AuthenticatedRequest } from "../middleware/auth.middleware.js";
-import { createMenuItemSchema } from "../validators/menu-item.validator.js";
+import { createMenuItemSchema ,updateMenuItemSchema} from "../validators/menu-item.validator.js";
 import {
   createMenuItem as createMenuItemService,
   getMenuItemsByRestaurant as getMenuItemsByRestaurantService,
   getMenuItemById as getMenuItemByIdService,
+   updateMenuItem as updateMenuItemService,
 } from "../services/menu-item.service.js";
 
 export const createMenuItem = async (
@@ -151,6 +152,77 @@ export const getMenuItemById = async (
     res.status(500).json({
       success: false,
       message: "Unable to fetch menu item",
+    });
+  }
+};
+
+export const updateMenuItem = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const menuItemId = Number(req.params.id);
+
+    if (Number.isNaN(menuItemId)) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid menu item ID",
+      });
+      return;
+    }
+
+    const validatedData = updateMenuItemSchema.parse(req.body);
+
+    const menuItem = await updateMenuItemService(
+      menuItemId,
+      req.user!.userId,
+      req.user!.role,
+      validatedData
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Menu item updated successfully",
+      data: menuItem,
+    });
+  } catch (error: any) {
+    if (error.message === "MENU_ITEM_NOT_FOUND") {
+      res.status(404).json({
+        success: false,
+        message: "Menu item not found",
+      });
+      return;
+    }
+
+    if (error.message === "MENU_CATEGORY_NOT_FOUND") {
+      res.status(404).json({
+        success: false,
+        message: "Menu category not found",
+      });
+      return;
+    }
+
+    if (error.message === "INVALID_MENU_CATEGORY") {
+      res.status(400).json({
+        success: false,
+        message: "Menu category does not belong to this restaurant",
+      });
+      return;
+    }
+
+    if (error.message === "FORBIDDEN") {
+      res.status(403).json({
+        success: false,
+        message: "You are not allowed to update this menu item",
+      });
+      return;
+    }
+
+    console.error(error);
+
+    res.status(400).json({
+      success: false,
+      message: "Unable to update menu item",
     });
   }
 };
