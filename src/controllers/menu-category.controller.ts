@@ -1,7 +1,49 @@
-import { Response } from "express";
 import { AuthenticatedRequest } from "../middleware/auth.middleware.js";
 import { createMenuCategorySchema } from "../validators/menu-category.validator.js";
-import { createMenuCategory as createMenuCategoryService } from "../services/menu-category.service.js";
+import { createMenuCategory as createMenuCategoryService ,
+    getMenuCategoriesByRestaurant as getMenuCategoriesByRestaurantService,
+} from "../services/menu-category.service.js";
+import { Request, Response } from "express";
+
+export const getMenuCategoriesByRestaurant = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const restaurantId = Number(req.params.restaurantId);
+
+    if (Number.isNaN(restaurantId)) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid restaurant ID",
+      });
+      return;
+    }
+
+    const categories =
+      await getMenuCategoriesByRestaurantService(restaurantId);
+
+    res.status(200).json({
+      success: true,
+      data: categories,
+    });
+  } catch (error: any) {
+    if (error.message === "RESTAURANT_NOT_FOUND") {
+      res.status(404).json({
+        success: false,
+        message: "Restaurant not found",
+      });
+      return;
+    }
+
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to fetch menu categories",
+    });
+  }
+};
 
 export const createMenuCategory = async (
   req: AuthenticatedRequest,

@@ -7,7 +7,7 @@ import {
 import { authenticate } from "../middleware/auth.middleware.js";
 import { authorizeRoles } from "../middleware/role.middleware.js";
 import { updateRestaurantCategories } from "../controllers/restaurant-category.controller.js";
-import { createMenuCategory } from "../controllers/menu-category.controller.js";
+import { createMenuCategory,getMenuCategoriesByRestaurant } from "../controllers/menu-category.controller.js";
 
 const router = Router();
 
@@ -35,6 +35,10 @@ router.post(
   authenticate,
   authorizeRoles("RESTAURANT_OWNER", "ADMIN"),
   createMenuCategory
+);
+router.get(
+  "/:restaurantId/menu-categories",
+  getMenuCategoriesByRestaurant
 );
 
 export default router;

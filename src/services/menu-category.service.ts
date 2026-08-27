@@ -36,3 +36,26 @@ export const createMenuCategory = async (
     },
   });
 };
+
+export const getMenuCategoriesByRestaurant = async (
+  restaurantId: number
+) => {
+  const restaurant = await prisma.restaurant.findUnique({
+    where: {
+      id: restaurantId,
+    },
+  });
+
+  if (!restaurant) {
+    throw new Error("RESTAURANT_NOT_FOUND");
+  }
+
+  return prisma.menuCategory.findMany({
+    where: {
+      restaurantId,
+    },
+    orderBy: {
+      displayOrder: "asc",
+    },
+  });
+};
