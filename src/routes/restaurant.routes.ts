@@ -6,6 +6,7 @@ import {
 } from "../controllers/restaurant.controller.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 import { authorizeRoles } from "../middleware/role.middleware.js";
+import { ROLES } from "../constants/roles.js";
 import { updateRestaurantCategories } from "../controllers/restaurant-category.controller.js";
 import {
   createMenuCategory,
@@ -25,46 +26,46 @@ const router = Router();
 router.post(
   "/",
   authenticate,
-  authorizeRoles("RESTAURANT_OWNER", "ADMIN"),
+  authorizeRoles(ROLES.RESTAURANT_OWNER, ROLES.ADMIN),
   createRestaurant,
 );
 router.get("/:id", getRestaurantById);
 router.put(
   "/:id",
   authenticate,
-  authorizeRoles("RESTAURANT_OWNER", "ADMIN"),
+  authorizeRoles(ROLES.RESTAURANT_OWNER, ROLES.ADMIN),
   updateRestaurant,
 );
 router.put(
   "/:restaurantId/categories",
   authenticate,
-  authorizeRoles("RESTAURANT_OWNER", "ADMIN"),
+  authorizeRoles(ROLES.RESTAURANT_OWNER, ROLES.ADMIN),
   updateRestaurantCategories,
 );
 router.post(
   "/:restaurantId/menu-categories",
   authenticate,
-  authorizeRoles("RESTAURANT_OWNER", "ADMIN"),
+  authorizeRoles(ROLES.RESTAURANT_OWNER, ROLES.ADMIN),
   createMenuCategory,
 );
 router.get("/:restaurantId/menu-categories", getMenuCategoriesByRestaurant);
 router.post(
   "/:restaurantId/menu-items",
   authenticate,
-  authorizeRoles("RESTAURANT_OWNER", "ADMIN"),
+  authorizeRoles(ROLES.RESTAURANT_OWNER, ROLES.ADMIN),
   createMenuItem,
 );
 router.get("/:restaurantId/menu-items", getMenuItemsByRestaurant);
 router.post(
   "/:restaurantId/images",
   authenticate,
-  authorizeRoles("RESTAURANT_OWNER", "ADMIN"),
+  authorizeRoles(ROLES.RESTAURANT_OWNER, ROLES.ADMIN),
   createRestaurantImage,
 );
 router.delete(
   "/:restaurantId/images/:imageId",
   authenticate,
-  authorizeRoles("RESTAURANT_OWNER", "ADMIN"),
+  authorizeRoles(ROLES.RESTAURANT_OWNER, ROLES.ADMIN),
   deleteRestaurantImage
 );
 

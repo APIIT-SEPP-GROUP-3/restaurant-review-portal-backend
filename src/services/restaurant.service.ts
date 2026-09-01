@@ -1,4 +1,5 @@
 import prisma from "../config/prisma.js";
+import { ROLES, Role } from "../constants/roles.js";
 
 interface CreateRestaurantInput {
   name: string;
@@ -69,7 +70,7 @@ interface UpdateRestaurantInput {
 export const updateRestaurant = async (
   restaurantId: number,
   userId: number,
-  userRole: string,
+  userRole: Role,
   data: UpdateRestaurantInput
 ) => {
   const restaurant = await prisma.restaurant.findUnique({
@@ -83,7 +84,7 @@ export const updateRestaurant = async (
   }
 
   if (
-    userRole !== "ADMIN" &&
+    userRole !== ROLES.ADMIN &&
     restaurant.ownerId !== userId
   ) {
     throw new Error("FORBIDDEN");

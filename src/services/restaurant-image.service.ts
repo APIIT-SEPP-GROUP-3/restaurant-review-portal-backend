@@ -1,4 +1,5 @@
 import prisma from "../config/prisma.js";
+import { ROLES, Role } from "../constants/roles.js";
 
 interface CreateRestaurantImageInput {
   imageUrl: string;
@@ -9,7 +10,7 @@ interface CreateRestaurantImageInput {
 export const createRestaurantImage = async (
   restaurantId: number,
   userId: number,
-  userRole: string,
+  userRole: Role,
   data: CreateRestaurantImageInput
 ) => {
   const restaurant = await prisma.restaurant.findUnique({
@@ -23,7 +24,7 @@ export const createRestaurantImage = async (
   }
 
   if (
-    userRole !== "ADMIN" &&
+    userRole !== ROLES.ADMIN &&
     restaurant.ownerId !== userId
   ) {
     throw new Error("FORBIDDEN");
@@ -55,7 +56,7 @@ export const deleteRestaurantImage = async (
   restaurantId: number,
   imageId: number,
   userId: number,
-  userRole: string
+  userRole: Role
 ) => {
   const restaurant = await prisma.restaurant.findUnique({
     where: {
@@ -67,7 +68,7 @@ export const deleteRestaurantImage = async (
     throw new Error("RESTAURANT_NOT_FOUND");
   }
 
-  if (userRole !== "ADMIN" && restaurant.ownerId !== userId) {
+  if (userRole !== ROLES.ADMIN && restaurant.ownerId !== userId) {
     throw new Error("FORBIDDEN");
   }
 

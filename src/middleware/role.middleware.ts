@@ -1,7 +1,8 @@
 import { NextFunction, Response } from "express";
 import { AuthenticatedRequest } from "./auth.middleware.js";
+import { Role } from "../constants/roles.js";
 
-export const authorizeRoles = (...allowedRoles: string[]) => {
+export const authorizeRoles = (...allowedRoles: Role[]) => {
   return (
     req: AuthenticatedRequest,
     res: Response,

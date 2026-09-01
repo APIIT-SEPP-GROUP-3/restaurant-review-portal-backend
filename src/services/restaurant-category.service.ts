@@ -1,4 +1,5 @@
 import prisma from "../config/prisma.js";
+import { ROLES, Role } from "../constants/roles.js";
 
 export const getAllRestaurantCategories = async () => {
   return prisma.restaurantCategory.findMany({
@@ -12,7 +13,7 @@ export const assignCategoriesToRestaurant = async (
   restaurantId: number,
   categoryIds: number[],
   userId: number,
-  userRole: string
+  userRole: Role
 ) => {
   const restaurant = await prisma.restaurant.findUnique({
     where: {
@@ -25,7 +26,7 @@ export const assignCategoriesToRestaurant = async (
   }
 
   if (
-    userRole !== "ADMIN" &&
+    userRole !== ROLES.ADMIN &&
     restaurant.ownerId !== userId
   ) {
     throw new Error("FORBIDDEN");

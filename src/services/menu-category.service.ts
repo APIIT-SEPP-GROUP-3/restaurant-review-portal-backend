@@ -1,4 +1,5 @@
 import prisma from "../config/prisma.js";
+import { ROLES, Role } from "../constants/roles.js";
 
 interface CreateMenuCategoryInput {
   name: string;
@@ -8,7 +9,7 @@ interface CreateMenuCategoryInput {
 export const createMenuCategory = async (
   restaurantId: number,
   userId: number,
-  userRole: string,
+  userRole: Role,
   data: CreateMenuCategoryInput
 ) => {
   const restaurant = await prisma.restaurant.findUnique({
@@ -22,7 +23,7 @@ export const createMenuCategory = async (
   }
 
   if (
-    userRole !== "ADMIN" &&
+    userRole !== ROLES.ADMIN &&
     restaurant.ownerId !== userId
   ) {
     throw new Error("FORBIDDEN");
@@ -68,7 +69,7 @@ interface UpdateMenuCategoryInput {
 export const updateMenuCategory = async (
   menuCategoryId: number,
   userId: number,
-  userRole: string,
+  userRole: Role,
   data: UpdateMenuCategoryInput
 ) => {
   const menuCategory = await prisma.menuCategory.findUnique({
@@ -85,7 +86,7 @@ export const updateMenuCategory = async (
   }
 
   if (
-    userRole !== "ADMIN" &&
+    userRole !== ROLES.ADMIN &&
     menuCategory.restaurant.ownerId !== userId
   ) {
     throw new Error("FORBIDDEN");

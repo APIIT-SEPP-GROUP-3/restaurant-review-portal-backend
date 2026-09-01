@@ -1,10 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import { verifyToken } from "../utils/jwt.js";
+import { Role } from "../constants/roles.js";
 
 export interface AuthenticatedRequest extends Request {
   user?: {
     userId: number;
-    role: string;
+    role: Role;
   };
 }
 

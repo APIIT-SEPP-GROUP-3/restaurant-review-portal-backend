@@ -1,4 +1,5 @@
 import prisma from "../config/prisma.js";
+import { ROLES, Role } from "../constants/roles.js";
 
 interface CreateMenuItemInput {
   menuCategoryId: number;
@@ -11,7 +12,7 @@ interface CreateMenuItemInput {
 export const createMenuItem = async (
   restaurantId: number,
   userId: number,
-  userRole: string,
+  userRole: Role,
   data: CreateMenuItemInput,
 ) => {
   const restaurant = await prisma.restaurant.findUnique({
@@ -24,7 +25,7 @@ export const createMenuItem = async (
     throw new Error("RESTAURANT_NOT_FOUND");
   }
 
-  if (userRole !== "ADMIN" && restaurant.ownerId !== userId) {
+  if (userRole !== ROLES.ADMIN && restaurant.ownerId !== userId) {
     throw new Error("FORBIDDEN");
   }
 
@@ -116,7 +117,7 @@ interface UpdateMenuItemInput {
 export const updateMenuItem = async (
   menuItemId: number,
   userId: number,
-  userRole: string,
+  userRole: Role,
   data: UpdateMenuItemInput
 ) => {
   const menuItem = await prisma.menuItem.findUnique({
@@ -133,7 +134,7 @@ export const updateMenuItem = async (
   }
 
   if (
-    userRole !== "ADMIN" &&
+    userRole !== ROLES.ADMIN &&
     menuItem.restaurant.ownerId !== userId
   ) {
     throw new Error("FORBIDDEN");
@@ -182,7 +183,7 @@ export const updateMenuItem = async (
 export const updateMenuItemAvailability = async (
   menuItemId: number,
   userId: number,
-  userRole: string,
+  userRole: Role,
   isAvailable: boolean
 ) => {
   const menuItem = await prisma.menuItem.findUnique({
@@ -199,7 +200,7 @@ export const updateMenuItemAvailability = async (
   }
 
   if (
-    userRole !== "ADMIN" &&
+    userRole !== ROLES.ADMIN &&
     menuItem.restaurant.ownerId !== userId
   ) {
     throw new Error("FORBIDDEN");
