@@ -50,3 +50,41 @@ export const createRestaurantImage = async (
     },
   });
 };
+
+export const deleteRestaurantImage = async (
+  restaurantId: number,
+  imageId: number,
+  userId: number,
+  userRole: string
+) => {
+  const restaurant = await prisma.restaurant.findUnique({
+    where: {
+      id: restaurantId,
+    },
+  });
+
+  if (!restaurant) {
+    throw new Error("RESTAURANT_NOT_FOUND");
+  }
+
+  if (userRole !== "ADMIN" && restaurant.ownerId !== userId) {
+    throw new Error("FORBIDDEN");
+  }
+
+  const image = await prisma.restaurantImage.findFirst({
+    where: {
+      id: imageId,
+      restaurantId,
+    },
+  });
+
+  if (!image) {
+    throw new Error("IMAGE_NOT_FOUND");
+  }
+
+  return prisma.restaurantImage.delete({
+    where: {
+      id: imageId,
+    },
+  });
+};
