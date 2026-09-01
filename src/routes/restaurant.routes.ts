@@ -9,6 +9,7 @@ import { authorizeRoles } from "../middleware/role.middleware.js";
 import { updateRestaurantCategories } from "../controllers/restaurant-category.controller.js";
 import { createMenuCategory,getMenuCategoriesByRestaurant } from "../controllers/menu-category.controller.js";
 import { createMenuItem ,getMenuItemsByRestaurant} from "../controllers/menu-item.controller.js";
+import { createRestaurantImage } from "../controllers/restaurant-image.controller.js";
 
 const router = Router();
 
@@ -50,6 +51,12 @@ router.post(
 router.get(
   "/:restaurantId/menu-items",
   getMenuItemsByRestaurant
+);
+router.post(
+  "/:restaurantId/images",
+  authenticate,
+  authorizeRoles("RESTAURANT_OWNER", "ADMIN"),
+  createRestaurantImage
 );
 
 export default router;
