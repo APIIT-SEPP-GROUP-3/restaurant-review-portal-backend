@@ -53,3 +53,44 @@ export const createMenuItemImage = async (
     },
   });
 };
+
+export const deleteMenuItemImage = async (
+  menuItemId: number,
+  imageId: number,
+  userId: number,
+  userRole: string
+) => {
+  const menuItem = await prisma.menuItem.findUnique({
+    where: {
+      id: menuItemId,
+    },
+    include: {
+      restaurant: true,
+    },
+  });
+
+  if (!menuItem) {
+    throw new Error("MENU_ITEM_NOT_FOUND");
+  }
+
+  if (userRole !== "ADMIN" && menuItem.restaurant.ownerId !== userId) {
+    throw new Error("FORBIDDEN");
+  }
+
+  const image = await prisma.menuItemImage.findFirst({
+    where: {
+      id: imageId,
+      menuItemId,
+    },
+  });
+
+  if (!image) {
+    throw new Error("IMAGE_NOT_FOUND");
+  }
+
+  return prisma.menuItemImage.delete({
+    where: {
+      id: imageId,
+    },
+  });
+};

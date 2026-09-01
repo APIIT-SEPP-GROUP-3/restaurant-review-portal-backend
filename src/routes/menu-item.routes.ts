@@ -2,9 +2,12 @@ import { Router } from "express";
 import {
   getMenuItemById,
   updateMenuItem,
-  updateMenuItemAvailability
+  updateMenuItemAvailability,
 } from "../controllers/menu-item.controller.js";
-import { createMenuItemImage } from "../controllers/menu-item-image.controller.js";
+import {
+  createMenuItemImage,
+  deleteMenuItemImage,
+} from "../controllers/menu-item-image.controller.js";
 
 import { authenticate } from "../middleware/auth.middleware.js";
 import { authorizeRoles } from "../middleware/role.middleware.js";
@@ -17,20 +20,26 @@ router.put(
   "/:id",
   authenticate,
   authorizeRoles("RESTAURANT_OWNER", "ADMIN"),
-  updateMenuItem
+  updateMenuItem,
 );
 
 router.patch(
   "/:id/availability",
   authenticate,
   authorizeRoles("RESTAURANT_OWNER", "ADMIN"),
-  updateMenuItemAvailability
+  updateMenuItemAvailability,
 );
 router.post(
   "/:menuItemId/images",
   authenticate,
   authorizeRoles("RESTAURANT_OWNER", "ADMIN"),
-  createMenuItemImage
+  createMenuItemImage,
+);
+router.delete(
+  "/:menuItemId/images/:imageId",
+  authenticate,
+  authorizeRoles("RESTAURANT_OWNER", "ADMIN"),
+  deleteMenuItemImage
 );
 
 export default router;
