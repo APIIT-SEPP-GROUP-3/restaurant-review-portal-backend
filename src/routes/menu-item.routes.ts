@@ -4,6 +4,7 @@ import {
   updateMenuItem,
   updateMenuItemAvailability
 } from "../controllers/menu-item.controller.js";
+import { createMenuItemImage } from "../controllers/menu-item-image.controller.js";
 
 import { authenticate } from "../middleware/auth.middleware.js";
 import { authorizeRoles } from "../middleware/role.middleware.js";
@@ -24,6 +25,12 @@ router.patch(
   authenticate,
   authorizeRoles("RESTAURANT_OWNER", "ADMIN"),
   updateMenuItemAvailability
+);
+router.post(
+  "/:menuItemId/images",
+  authenticate,
+  authorizeRoles("RESTAURANT_OWNER", "ADMIN"),
+  createMenuItemImage
 );
 
 export default router;
