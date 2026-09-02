@@ -1,0 +1,20 @@
+import { Router } from "express";
+import {
+  addRestaurantCategory,
+  getRestaurantCategories,
+} from "../controllers/restaurant-category.controller.js";
+import { authenticate } from "../middleware/auth.middleware.js";
+import { authorizeRoles } from "../middleware/role.middleware.js";
+import { ROLES } from "../constants/roles.js";
+
+const router = Router();
+
+router.get("/", getRestaurantCategories);
+router.post(
+  "/",
+  authenticate,
+  authorizeRoles(ROLES.ADMIN),
+  addRestaurantCategory
+);
+
+export default router;

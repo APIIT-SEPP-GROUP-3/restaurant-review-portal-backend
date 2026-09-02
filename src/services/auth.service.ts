@@ -1,6 +1,7 @@
 import prisma from "../config/prisma.js";
 import { generateToken } from "../utils/jwt.js";
 import { comparePassword, hashPassword } from "../utils/password.js";
+import { ROLES, Role } from "../constants/roles.js";
 
 interface RegisterInput {
   firstName: string;
@@ -29,7 +30,7 @@ export const registerUser = async (data: RegisterInput) => {
 
   const customerRole = await prisma.role.findUnique({
     where: {
-      roleName: "CUSTOMER",
+      roleName: ROLES.CUSTOMER,
     },
   });
 
@@ -57,7 +58,7 @@ export const registerUser = async (data: RegisterInput) => {
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
-    role: user.role.roleName,
+    role: user.role.roleName as Role,
   };
 };
 
@@ -88,7 +89,7 @@ export const loginUser = async (data: LoginInput) => {
 
   const token = generateToken({
     userId: user.id,
-    role: user.role.roleName,
+    role: user.role.roleName as Role,
   });
 
   return {
@@ -98,7 +99,7 @@ export const loginUser = async (data: LoginInput) => {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
-      role: user.role.roleName,
+      role: user.role.roleName as Role,
     },
   };
 };
@@ -122,6 +123,6 @@ export const getCurrentUser = async (userId: number) => {
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
-    role: user.role.roleName,
+    role: user.role.roleName as Role,
   };
 };

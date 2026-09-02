@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client.js";
+import { ROLES } from "../src/constants/roles.js";
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
@@ -13,19 +14,19 @@ const prisma = new PrismaClient({
 async function main() {
   const roles = [
     {
-      roleName: "CUSTOMER",
+      roleName: ROLES.CUSTOMER,
       description: "Regular customer account",
     },
     {
-      roleName: "RESTAURANT_OWNER",
+      roleName: ROLES.RESTAURANT_OWNER,
       description: "Restaurant owner account",
     },
     {
-      roleName: "MODERATOR",
+      roleName: ROLES.MODERATOR,
       description: "Review and comment moderator",
     },
     {
-      roleName: "ADMIN",
+      roleName: ROLES.ADMIN,
       description: "System administrator",
     },
   ];
