@@ -221,67 +221,96 @@ interface MenuItemSearchFilters {
   restaurantId?: number;
   menuCategoryId?: number;
   isAvailable?: boolean;
+  page: number;
+  limit: number;
+  sortBy: "name" | "price" | "createdAt";
+  sortOrder: "asc" | "desc";
 }
 
 export const getMenuItems = async (
   filters: MenuItemSearchFilters
 ) => {
-  return prisma.menuItem.findMany({
-    where: {
-      ...(filters.search && {
-        OR: [
-          {
-            name: {
-              contains: filters.search,
-              mode: "insensitive",
-            },
+  const skip = (filters.page - 1) * filters.limit;
+
+  const where = {
+    ...(filters.search && {
+      OR: [
+        {
+          name: {
+            contains: filters.search,
+            mode: "insensitive" as const,
           },
-          {
-            description: {
-              contains: filters.search,
-              mode: "insensitive",
-            },
+        },
+        {
+          description: {
+            contains: filters.search,
+            mode: "insensitive" as const,
           },
-        ],
-      }),
+        },
+      ],
+    }),
 
-      ...(filters.restaurantId && {
-        restaurantId: filters.restaurantId,
-      }),
+    ...(filters.restaurantId && {
+      restaurantId: filters.restaurantId,
+    }),
 
-      ...(filters.menuCategoryId && {
-        menuCategoryId: filters.menuCategoryId,
-      }),
+    ...(filters.menuCategoryId && {
+      menuCategoryId: filters.menuCategoryId,
+    }),
 
-      ...(filters.isAvailable !== undefined && {
-        isAvailable: filters.isAvailable,
-      }),
+    ...(filters.isAvailable !== undefined && {
+      isAvailable: filters.isAvailable,
+    }),
 
-      restaurant: {
-        status: "ACTIVE",
-      },
+    restaurant: {
+      status: "ACTIVE" as const,
     },
+  };
 
-    include: {
-      restaurant: {
-        select: {
-          id: true,
-          name: true,
-          city: true,
+  const [menuItems, total] = await Promise.all([
+    prisma.menuItem.findMany({
+      where,
+
+      include: {
+        restaurant: {
+          select: {
+            id: true,
+            name: true,
+            city: true,
+          },
+        },
+
+        menuCategory: true,
+
+        images: {
+          where: {
+            isPrimary: true,
+          },
         },
       },
 
-      menuCategory: true,
-
-      images: {
-        where: {
-          isPrimary: true,
-        },
+      orderBy: {
+        [filters.sortBy]: filters.sortOrder,
       },
-    },
 
-    orderBy: {
-      name: "asc",
+      skip,
+      take: filters.limit,
+    }),
+
+    prisma.menuItem.count({
+      where,
+    }),
+  ]);
+
+  const totalPages = Math.ceil(total / filters.limit);
+
+  return {
+    menuItems,
+    pagination: {
+      page: filters.page,
+      limit: filters.limit,
+      total,
+      totalPages,
     },
-  });
+  };
 };

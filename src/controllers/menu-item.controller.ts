@@ -290,16 +290,17 @@ export const updateMenuItemAvailability = async (
 
 export const getMenuItems = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const filters = menuItemSearchSchema.parse(req.query);
 
-    const menuItems = await getMenuItemsService(filters);
+    const result = await getMenuItemsService(filters);
 
     res.status(200).json({
       success: true,
-      data: menuItems,
+      data: result.menuItems,
+      pagination: result.pagination,
     });
   } catch (error) {
     console.error(error);
