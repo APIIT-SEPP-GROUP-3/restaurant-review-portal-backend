@@ -97,3 +97,79 @@ export const updateRestaurant = async (
     data,
   });
 };
+
+interface RestaurantSearchFilters {
+  search?: string;
+  city?: string;
+  categoryId?: number;
+}
+
+export const getRestaurants = async (
+  filters: RestaurantSearchFilters
+) => {
+  return prisma.restaurant.findMany({
+    where: {
+      status: "ACTIVE",
+
+      ...(filters.search && {
+        OR: [
+          {
+            name: {
+              contains: filters.search,
+              mode: "insensitive",
+            },
+          },
+          {
+            description: {
+              contains: filters.search,
+              mode: "insensitive",
+            },
+          },
+          {
+            menuItems: {
+              some: {
+                name: {
+                  contains: filters.search,
+                  mode: "insensitive",
+                },
+              },
+            },
+          },
+        ],
+      }),
+
+      ...(filters.city && {
+        city: {
+          equals: filters.city,
+          mode: "insensitive",
+        },
+      }),
+
+      ...(filters.categoryId && {
+        categories: {
+          some: {
+            categoryId: filters.categoryId,
+          },
+        },
+      }),
+    },
+
+    include: {
+      categories: {
+        include: {
+          category: true,
+        },
+      },
+
+      images: {
+        where: {
+          isPrimary: true,
+        },
+      },
+    },
+
+    orderBy: {
+      name: "asc",
+    },
+  });
+};

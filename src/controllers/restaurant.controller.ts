@@ -1,11 +1,11 @@
 import { Response, Request } from "express";
 import { AuthenticatedRequest } from "../middleware/auth.middleware.js";
-import { createRestaurantSchema } from "../validators/restaurant.validator.js";
-import { updateRestaurantSchema } from "../validators/restaurant.validator.js";
+import { createRestaurantSchema,restaurantSearchSchema,updateRestaurantSchema } from "../validators/restaurant.validator.js";
 import {
   createRestaurant as createRestaurantService,
   getRestaurantById as getRestaurantByIdService,
   updateRestaurant as updateRestaurantService,
+  getRestaurants as getRestaurantsService,
 } from "../services/restaurant.service.js";
 
 export const createRestaurant = async (
@@ -125,6 +125,30 @@ export const updateRestaurant = async (
     res.status(400).json({
       success: false,
       message: "Unable to update restaurant",
+    });
+  }
+};
+
+export const getRestaurants = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const filters = restaurantSearchSchema.parse(req.query);
+
+    const restaurants =
+      await getRestaurantsService(filters);
+
+    res.status(200).json({
+      success: true,
+      data: restaurants,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(400).json({
+      success: false,
+      message: "Unable to fetch restaurants",
     });
   }
 };
