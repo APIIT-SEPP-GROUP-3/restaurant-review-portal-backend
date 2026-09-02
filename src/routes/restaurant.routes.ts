@@ -3,6 +3,7 @@ import {
   createRestaurant,
   getRestaurantById,
   updateRestaurant,
+  getRestaurants
 } from "../controllers/restaurant.controller.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 import { authorizeRoles } from "../middleware/role.middleware.js";
@@ -29,6 +30,7 @@ router.post(
   authorizeRoles(ROLES.RESTAURANT_OWNER, ROLES.ADMIN),
   createRestaurant,
 );
+router.get("/", getRestaurants);
 router.get("/:id", getRestaurantById);
 router.put(
   "/:id",

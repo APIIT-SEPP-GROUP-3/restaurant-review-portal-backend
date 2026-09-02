@@ -21,3 +21,36 @@ export const updateRestaurantSchema = z.object({
   website: z.string().url().optional(),
   openingHours: z.string().max(500).optional(),
 });
+
+export const restaurantSearchSchema = z.object({
+  search: z.string().trim().optional(),
+
+  city: z.string().trim().optional(),
+
+  categoryId: z.coerce
+    .number()
+    .int()
+    .positive()
+    .optional(),
+
+  page: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(1),
+
+  limit: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(50)
+    .default(10),
+
+  sortBy: z
+    .enum(["name", "city", "createdAt"])
+    .default("name"),
+
+  sortOrder: z
+    .enum(["asc", "desc"])
+    .default("asc"),
+});

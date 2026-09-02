@@ -97,3 +97,108 @@ export const updateRestaurant = async (
     data,
   });
 };
+
+interface RestaurantSearchFilters {
+  search?: string;
+  city?: string;
+  categoryId?: number;
+  page: number;
+  limit: number;
+  sortBy: "name" | "city" | "createdAt";
+  sortOrder: "asc" | "desc";
+}
+
+export const getRestaurants = async (
+  filters: RestaurantSearchFilters
+) => {
+  const skip = (filters.page - 1) * filters.limit;
+
+  const where = {
+    status: "ACTIVE" as const,
+
+    ...(filters.search && {
+      OR: [
+        {
+          name: {
+            contains: filters.search,
+            mode: "insensitive" as const,
+          },
+        },
+        {
+          description: {
+            contains: filters.search,
+            mode: "insensitive" as const,
+          },
+        },
+        {
+          menuItems: {
+            some: {
+              name: {
+                contains: filters.search,
+                mode: "insensitive" as const,
+              },
+            },
+          },
+        },
+      ],
+    }),
+
+    ...(filters.city && {
+      city: {
+        equals: filters.city,
+        mode: "insensitive" as const,
+      },
+    }),
+
+    ...(filters.categoryId && {
+      categories: {
+        some: {
+          categoryId: filters.categoryId,
+        },
+      },
+    }),
+  };
+
+  const [restaurants, total] = await Promise.all([
+    prisma.restaurant.findMany({
+      where,
+
+      include: {
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+
+        images: {
+          where: {
+            isPrimary: true,
+          },
+        },
+      },
+
+      orderBy: {
+        [filters.sortBy]: filters.sortOrder,
+      },
+
+      skip,
+      take: filters.limit,
+    }),
+
+    prisma.restaurant.count({
+      where,
+    }),
+  ]);
+
+  const totalPages = Math.ceil(total / filters.limit);
+
+  return {
+    restaurants,
+    pagination: {
+      page: filters.page,
+      limit: filters.limit,
+      total,
+      totalPages,
+    },
+  };
+};
