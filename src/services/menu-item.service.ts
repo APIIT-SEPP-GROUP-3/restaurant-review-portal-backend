@@ -215,3 +215,73 @@ export const updateMenuItemAvailability = async (
     },
   });
 };
+
+interface MenuItemSearchFilters {
+  search?: string;
+  restaurantId?: number;
+  menuCategoryId?: number;
+  isAvailable?: boolean;
+}
+
+export const getMenuItems = async (
+  filters: MenuItemSearchFilters
+) => {
+  return prisma.menuItem.findMany({
+    where: {
+      ...(filters.search && {
+        OR: [
+          {
+            name: {
+              contains: filters.search,
+              mode: "insensitive",
+            },
+          },
+          {
+            description: {
+              contains: filters.search,
+              mode: "insensitive",
+            },
+          },
+        ],
+      }),
+
+      ...(filters.restaurantId && {
+        restaurantId: filters.restaurantId,
+      }),
+
+      ...(filters.menuCategoryId && {
+        menuCategoryId: filters.menuCategoryId,
+      }),
+
+      ...(filters.isAvailable !== undefined && {
+        isAvailable: filters.isAvailable,
+      }),
+
+      restaurant: {
+        status: "ACTIVE",
+      },
+    },
+
+    include: {
+      restaurant: {
+        select: {
+          id: true,
+          name: true,
+          city: true,
+        },
+      },
+
+      menuCategory: true,
+
+      images: {
+        where: {
+          isPrimary: true,
+        },
+      },
+    },
+
+    orderBy: {
+      name: "asc",
+    },
+  });
+};

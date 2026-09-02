@@ -3,6 +3,7 @@ import {
   getMenuItemById,
   updateMenuItem,
   updateMenuItemAvailability,
+  getMenuItems,
 } from "../controllers/menu-item.controller.js";
 import {
   createMenuItemImage,
@@ -14,6 +15,8 @@ import { authorizeRoles } from "../middleware/role.middleware.js";
 import { ROLES } from "../constants/roles.js";
 
 const router = Router();
+
+router.get("/", getMenuItems);
 
 router.get("/:id", getMenuItemById);
 

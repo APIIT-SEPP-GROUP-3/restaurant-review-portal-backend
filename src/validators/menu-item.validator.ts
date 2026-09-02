@@ -19,3 +19,24 @@ export const updateMenuItemSchema = z.object({
 export const updateMenuItemAvailabilitySchema = z.object({
   isAvailable: z.boolean(),
 });
+
+export const menuItemSearchSchema = z.object({
+  search: z.string().trim().optional(),
+
+  restaurantId: z.coerce
+    .number()
+    .int()
+    .positive()
+    .optional(),
+
+  menuCategoryId: z.coerce
+    .number()
+    .int()
+    .positive()
+    .optional(),
+
+  isAvailable: z
+    .enum(["true", "false"])
+    .transform((value) => value === "true")
+    .optional(),
+});

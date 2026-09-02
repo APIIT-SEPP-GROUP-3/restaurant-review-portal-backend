@@ -4,11 +4,13 @@ import {
   createMenuItemSchema,
   updateMenuItemSchema,
   updateMenuItemAvailabilitySchema,
+  menuItemSearchSchema,
 } from "../validators/menu-item.validator.js";
 import {
   createMenuItem as createMenuItemService,
   getMenuItemsByRestaurant as getMenuItemsByRestaurantService,
   getMenuItemById as getMenuItemByIdService,
+  getMenuItems as getMenuItemsService,
   updateMenuItem as updateMenuItemService,
   updateMenuItemAvailability as updateMenuItemAvailabilityService,
 } from "../services/menu-item.service.js";
@@ -233,7 +235,7 @@ export const updateMenuItem = async (
 
 export const updateMenuItemAvailability = async (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const menuItemId = Number(req.params.id);
@@ -246,16 +248,14 @@ export const updateMenuItemAvailability = async (
       return;
     }
 
-    const validatedData =
-      updateMenuItemAvailabilitySchema.parse(req.body);
+    const validatedData = updateMenuItemAvailabilitySchema.parse(req.body);
 
-    const menuItem =
-      await updateMenuItemAvailabilityService(
-        menuItemId,
-        req.user!.userId,
-        req.user!.role,
-        validatedData.isAvailable
-      );
+    const menuItem = await updateMenuItemAvailabilityService(
+      menuItemId,
+      req.user!.userId,
+      req.user!.role,
+      validatedData.isAvailable,
+    );
 
     res.status(200).json({
       success: true,
@@ -284,6 +284,29 @@ export const updateMenuItemAvailability = async (
     res.status(400).json({
       success: false,
       message: "Unable to update menu item availability",
+    });
+  }
+};
+
+export const getMenuItems = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const filters = menuItemSearchSchema.parse(req.query);
+
+    const menuItems = await getMenuItemsService(filters);
+
+    res.status(200).json({
+      success: true,
+      data: menuItems,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(400).json({
+      success: false,
+      message: "Unable to fetch menu items",
     });
   }
 };
