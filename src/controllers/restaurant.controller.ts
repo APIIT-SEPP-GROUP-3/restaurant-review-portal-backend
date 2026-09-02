@@ -1,6 +1,10 @@
 import { Response, Request } from "express";
 import { AuthenticatedRequest } from "../middleware/auth.middleware.js";
-import { createRestaurantSchema,restaurantSearchSchema,updateRestaurantSchema } from "../validators/restaurant.validator.js";
+import {
+  createRestaurantSchema,
+  restaurantSearchSchema,
+  updateRestaurantSchema,
+} from "../validators/restaurant.validator.js";
 import {
   createRestaurant as createRestaurantService,
   getRestaurantById as getRestaurantByIdService,
@@ -76,7 +80,7 @@ export const getRestaurantById = async (
 
 export const updateRestaurant = async (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const restaurantId = Number(req.params.id);
@@ -95,7 +99,7 @@ export const updateRestaurant = async (
       restaurantId,
       req.user!.userId,
       req.user!.role,
-      validatedData
+      validatedData,
     );
 
     res.status(200).json({
@@ -131,17 +135,17 @@ export const updateRestaurant = async (
 
 export const getRestaurants = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const filters = restaurantSearchSchema.parse(req.query);
 
-    const restaurants =
-      await getRestaurantsService(filters);
+    const result = await getRestaurantsService(filters);
 
     res.status(200).json({
       success: true,
-      data: restaurants,
+      data: result.restaurants,
+      pagination: result.pagination,
     });
   } catch (error) {
     console.error(error);

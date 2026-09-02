@@ -102,74 +102,103 @@ interface RestaurantSearchFilters {
   search?: string;
   city?: string;
   categoryId?: number;
+  page: number;
+  limit: number;
+  sortBy: "name" | "city" | "createdAt";
+  sortOrder: "asc" | "desc";
 }
 
 export const getRestaurants = async (
   filters: RestaurantSearchFilters
 ) => {
-  return prisma.restaurant.findMany({
-    where: {
-      status: "ACTIVE",
+  const skip = (filters.page - 1) * filters.limit;
 
-      ...(filters.search && {
-        OR: [
-          {
-            name: {
-              contains: filters.search,
-              mode: "insensitive",
-            },
+  const where = {
+    status: "ACTIVE" as const,
+
+    ...(filters.search && {
+      OR: [
+        {
+          name: {
+            contains: filters.search,
+            mode: "insensitive" as const,
           },
-          {
-            description: {
-              contains: filters.search,
-              mode: "insensitive",
-            },
+        },
+        {
+          description: {
+            contains: filters.search,
+            mode: "insensitive" as const,
           },
-          {
-            menuItems: {
-              some: {
-                name: {
-                  contains: filters.search,
-                  mode: "insensitive",
-                },
+        },
+        {
+          menuItems: {
+            some: {
+              name: {
+                contains: filters.search,
+                mode: "insensitive" as const,
               },
             },
           },
-        ],
-      }),
-
-      ...(filters.city && {
-        city: {
-          equals: filters.city,
-          mode: "insensitive",
         },
-      }),
+      ],
+    }),
 
-      ...(filters.categoryId && {
+    ...(filters.city && {
+      city: {
+        equals: filters.city,
+        mode: "insensitive" as const,
+      },
+    }),
+
+    ...(filters.categoryId && {
+      categories: {
+        some: {
+          categoryId: filters.categoryId,
+        },
+      },
+    }),
+  };
+
+  const [restaurants, total] = await Promise.all([
+    prisma.restaurant.findMany({
+      where,
+
+      include: {
         categories: {
-          some: {
-            categoryId: filters.categoryId,
+          include: {
+            category: true,
           },
         },
-      }),
-    },
 
-    include: {
-      categories: {
-        include: {
-          category: true,
+        images: {
+          where: {
+            isPrimary: true,
+          },
         },
       },
 
-      images: {
-        where: {
-          isPrimary: true,
-        },
+      orderBy: {
+        [filters.sortBy]: filters.sortOrder,
       },
-    },
 
-    orderBy: {
-      name: "asc",
+      skip,
+      take: filters.limit,
+    }),
+
+    prisma.restaurant.count({
+      where,
+    }),
+  ]);
+
+  const totalPages = Math.ceil(total / filters.limit);
+
+  return {
+    restaurants,
+    pagination: {
+      page: filters.page,
+      limit: filters.limit,
+      total,
+      totalPages,
     },
-  });
+  };
 };

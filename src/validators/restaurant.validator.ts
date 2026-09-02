@@ -32,4 +32,25 @@ export const restaurantSearchSchema = z.object({
     .int()
     .positive()
     .optional(),
+
+  page: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(1),
+
+  limit: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(50)
+    .default(10),
+
+  sortBy: z
+    .enum(["name", "city", "createdAt"])
+    .default("name"),
+
+  sortOrder: z
+    .enum(["asc", "desc"])
+    .default("asc"),
 });
