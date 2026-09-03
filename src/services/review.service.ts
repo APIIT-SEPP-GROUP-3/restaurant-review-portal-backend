@@ -155,3 +155,47 @@ export const getApprovedReviewsByRestaurant = async (
     },
   });
 };
+
+export const getApprovedReviewsByMenuItem = async (
+  menuItemId: number
+) => {
+  const menuItem = await prisma.menuItem.findUnique({
+    where: {
+      id: menuItemId,
+    },
+  });
+
+  if (!menuItem) {
+    throw new Error("MENU_ITEM_NOT_FOUND");
+  }
+
+  return prisma.review.findMany({
+    where: {
+      menuItemId,
+      moderationStatus: "APPROVED",
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+      restaurant: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      ratings: {
+        include: {
+          ratingType: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+};

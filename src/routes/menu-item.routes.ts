@@ -13,10 +13,16 @@ import {
 import { authenticate } from "../middleware/auth.middleware.js";
 import { authorizeRoles } from "../middleware/role.middleware.js";
 import { ROLES } from "../constants/roles.js";
+import { getMenuItemReviews } from "../controllers/review.controller.js";
 
 const router = Router();
 
 router.get("/", getMenuItems);
+
+router.get(
+  "/:menuItemId/reviews",
+  getMenuItemReviews
+);
 
 router.get("/:id", getMenuItemById);
 
@@ -45,5 +51,6 @@ router.delete(
   authorizeRoles(ROLES.RESTAURANT_OWNER, ROLES.ADMIN),
   deleteMenuItemImage
 );
+
 
 export default router;

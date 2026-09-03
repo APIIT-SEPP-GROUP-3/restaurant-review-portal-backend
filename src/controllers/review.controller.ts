@@ -4,6 +4,7 @@ import { createReviewSchema } from "../validators/review.validator.js";
 import {
   createReview as createReviewService,
   getApprovedReviewsByRestaurant as getApprovedReviewsByRestaurantService,
+  getApprovedReviewsByMenuItem as getApprovedReviewsByMenuItemService,
 } from "../services/review.service.js";
 
 export const createReview = async (
@@ -80,7 +81,7 @@ export const createReview = async (
 
 export const getRestaurantReviews = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const restaurantId = Number(req.params.restaurantId);
@@ -93,8 +94,7 @@ export const getRestaurantReviews = async (
       return;
     }
 
-    const reviews =
-      await getApprovedReviewsByRestaurantService(restaurantId);
+    const reviews = await getApprovedReviewsByRestaurantService(restaurantId);
 
     res.status(200).json({
       success: true,
@@ -114,6 +114,46 @@ export const getRestaurantReviews = async (
     res.status(500).json({
       success: false,
       message: "Unable to fetch restaurant reviews",
+    });
+  }
+};
+
+export const getMenuItemReviews = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const menuItemId = Number(req.params.menuItemId);
+
+    if (Number.isNaN(menuItemId)) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid menu item ID",
+      });
+      return;
+    }
+
+    const reviews =
+      await getApprovedReviewsByMenuItemService(menuItemId);
+
+    res.status(200).json({
+      success: true,
+      data: reviews,
+    });
+  } catch (error: any) {
+    if (error.message === "MENU_ITEM_NOT_FOUND") {
+      res.status(404).json({
+        success: false,
+        message: "Menu item not found",
+      });
+      return;
+    }
+
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to fetch menu item reviews",
     });
   }
 };
