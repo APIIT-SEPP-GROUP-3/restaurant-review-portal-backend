@@ -21,7 +21,7 @@ import {
   createRestaurantImage,
   deleteRestaurantImage,
 } from "../controllers/restaurant-image.controller.js";
-import { getRestaurantReviews } from "../controllers/review.controller.js";
+import { getRestaurantReviews ,getRestaurantRatingSummary} from "../controllers/review.controller.js";
 
 const router = Router();
 
@@ -74,6 +74,10 @@ router.delete(
 router.get(
   "/:restaurantId/reviews",
   getRestaurantReviews
+);
+router.get(
+  "/:restaurantId/rating-summary",
+  getRestaurantRatingSummary
 );
 
 export default router;

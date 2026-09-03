@@ -235,3 +235,88 @@ export const getApprovedReviewById = async (reviewId: number) => {
     },
   });
 };
+
+export const getRestaurantRatingSummary = async (
+  restaurantId: number
+) => {
+  const restaurant = await prisma.restaurant.findUnique({
+    where: {
+      id: restaurantId,
+    },
+  });
+
+  if (!restaurant) {
+    throw new Error("RESTAURANT_NOT_FOUND");
+  }
+
+  const reviews = await prisma.review.findMany({
+    where: {
+      restaurantId,
+      moderationStatus: "APPROVED",
+    },
+    include: {
+      ratings: {
+        include: {
+          ratingType: true,
+        },
+      },
+    },
+  });
+
+  if (reviews.length === 0) {
+    return {
+      overallAverage: null,
+      reviewCount: 0,
+      ratingTypes: [],
+    };
+  }
+
+  const overallAverage =
+    reviews.reduce(
+      (total, review) =>
+        total + Number(review.overallRating ?? 0),
+      0
+    ) / reviews.length;
+
+  const ratingMap = new Map<
+    number,
+    {
+      name: string;
+      total: number;
+      count: number;
+    }
+  >();
+
+  for (const review of reviews) {
+    for (const rating of review.ratings) {
+      const existing = ratingMap.get(rating.ratingTypeId);
+
+      if (existing) {
+        existing.total += rating.ratingValue;
+        existing.count += 1;
+      } else {
+        ratingMap.set(rating.ratingTypeId, {
+          name: rating.ratingType.name,
+          total: rating.ratingValue,
+          count: 1,
+        });
+      }
+    }
+  }
+
+  const ratingTypes = Array.from(ratingMap.entries()).map(
+    ([ratingTypeId, value]) => ({
+      ratingTypeId,
+      name: value.name,
+      average: Number(
+        (value.total / value.count).toFixed(2)
+      ),
+    })
+  );
+
+  return {
+    overallAverage: Number(overallAverage.toFixed(2)),
+    reviewCount: reviews.length,
+    ratingTypes,
+  };
+};
