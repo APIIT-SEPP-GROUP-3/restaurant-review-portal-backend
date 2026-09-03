@@ -5,6 +5,7 @@ import restaurantRoutes from "./routes/restaurant.routes.js";
 import restaurantCategoryRoutes from "./routes/restaurant-category.routes.js";
 import menuCategoryRoutes from "./routes/menu-category.routes.js";
 import menuItemRoutes from "./routes/menu-item.routes.js";
+import ratingTypeRoutes from "./routes/rating-type.routes.js";
 
 const app = express();
 
@@ -26,4 +27,5 @@ app.use(
 );
 app.use("/api/menu-categories", menuCategoryRoutes);
 app.use("/api/menu-items", menuItemRoutes);
+app.use("/api/rating-types", ratingTypeRoutes);
 export default app;
