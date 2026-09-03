@@ -7,6 +7,7 @@ import {
   getApprovedReviewsByRestaurant as getApprovedReviewsByRestaurantService,
   getApprovedReviewsByMenuItem as getApprovedReviewsByMenuItemService,
   getRestaurantRatingSummary as getRestaurantRatingSummaryService,
+  getMenuItemRatingSummary as getMenuItemRatingSummaryService,
 } from "../services/review.service.js";
 
 export const createReview = async (
@@ -234,6 +235,46 @@ export const getRestaurantRatingSummary = async (
     res.status(500).json({
       success: false,
       message: "Unable to fetch restaurant rating summary",
+    });
+  }
+};
+
+export const getMenuItemRatingSummary = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const menuItemId = Number(req.params.menuItemId);
+
+    if (Number.isNaN(menuItemId)) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid menu item ID",
+      });
+      return;
+    }
+
+    const summary =
+      await getMenuItemRatingSummaryService(menuItemId);
+
+    res.status(200).json({
+      success: true,
+      data: summary,
+    });
+  } catch (error: any) {
+    if (error.message === "MENU_ITEM_NOT_FOUND") {
+      res.status(404).json({
+        success: false,
+        message: "Menu item not found",
+      });
+      return;
+    }
+
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to fetch menu item rating summary",
     });
   }
 };

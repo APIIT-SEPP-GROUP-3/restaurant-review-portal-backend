@@ -13,7 +13,7 @@ import {
 import { authenticate } from "../middleware/auth.middleware.js";
 import { authorizeRoles } from "../middleware/role.middleware.js";
 import { ROLES } from "../constants/roles.js";
-import { getMenuItemReviews } from "../controllers/review.controller.js";
+import { getMenuItemReviews,getMenuItemRatingSummary, } from "../controllers/review.controller.js";
 
 const router = Router();
 
@@ -23,7 +23,10 @@ router.get(
   "/:menuItemId/reviews",
   getMenuItemReviews
 );
-
+router.get(
+  "/:menuItemId/rating-summary",
+  getMenuItemRatingSummary
+);
 router.get("/:id", getMenuItemById);
 
 router.put(
