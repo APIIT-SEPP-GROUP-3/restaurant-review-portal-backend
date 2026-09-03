@@ -1,7 +1,10 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 import { AuthenticatedRequest } from "../middleware/auth.middleware.js";
 import { createReviewCommentSchema } from "../validators/review-comment.validator.js";
-import { createReviewComment as createReviewCommentService } from "../services/review-comment.service.js";
+import {
+  createReviewComment as createReviewCommentService,
+  getApprovedCommentsByReview as getApprovedCommentsByReviewService,
+} from "../services/review-comment.service.js";
 
 export const createReviewComment = async (
   req: AuthenticatedRequest,
@@ -72,6 +75,54 @@ export const createReviewComment = async (
     res.status(400).json({
       success: false,
       message: "Unable to submit comment",
+    });
+  }
+};
+
+export const getReviewComments = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const reviewId = Number(req.params.reviewId);
+
+    if (Number.isNaN(reviewId)) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid review ID",
+      });
+      return;
+    }
+
+    const comments =
+      await getApprovedCommentsByReviewService(reviewId);
+
+    res.status(200).json({
+      success: true,
+      data: comments,
+    });
+  } catch (error: any) {
+    if (error.message === "REVIEW_NOT_FOUND") {
+      res.status(404).json({
+        success: false,
+        message: "Review not found",
+      });
+      return;
+    }
+
+    if (error.message === "REVIEW_NOT_APPROVED") {
+      res.status(404).json({
+        success: false,
+        message: "Review not found",
+      });
+      return;
+    }
+
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to fetch review comments",
     });
   }
 };

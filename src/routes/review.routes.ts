@@ -5,7 +5,10 @@ import {
 } from "../controllers/review.controller.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 import { authorizeRoles } from "../middleware/role.middleware.js";
-import { createReviewComment } from "../controllers/review-comment.controller.js";
+import {
+  createReviewComment,
+  getReviewComments,
+} from "../controllers/review-comment.controller.js";
 
 const router = Router();
 
@@ -18,6 +21,11 @@ router.post(
   authenticate,
   authorizeRoles("CUSTOMER", "RESTAURANT_OWNER", "ADMIN"),
   createReviewComment,
+);
+
+router.get(
+  "/:reviewId/comments",
+  getReviewComments
 );
 
 export default router;

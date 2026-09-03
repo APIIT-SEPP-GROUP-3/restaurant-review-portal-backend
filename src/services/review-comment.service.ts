@@ -54,3 +54,68 @@ export const createReviewComment = async (
     },
   });
 };
+
+export const getApprovedCommentsByReview = async (
+  reviewId: number
+) => {
+  const review = await prisma.review.findUnique({
+    where: {
+      id: reviewId,
+    },
+  });
+
+  if (!review) {
+    throw new Error("REVIEW_NOT_FOUND");
+  }
+
+  if (review.moderationStatus !== "APPROVED") {
+    throw new Error("REVIEW_NOT_APPROVED");
+  }
+
+  return prisma.reviewComment.findMany({
+    where: {
+      reviewId,
+      moderationStatus: "APPROVED",
+      parentCommentId: null,
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          role: {
+            select: {
+              roleName: true,
+            },
+          },
+        },
+      },
+      replies: {
+        where: {
+          moderationStatus: "APPROVED",
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              role: {
+                select: {
+                  roleName: true,
+                },
+              },
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "asc",
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "asc",
+    },
+  });
+};
