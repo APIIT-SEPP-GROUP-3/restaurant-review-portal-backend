@@ -3,6 +3,7 @@ import { AuthenticatedRequest } from "../middleware/auth.middleware.js";
 import { createReviewSchema } from "../validators/review.validator.js";
 import {
   createReview as createReviewService,
+  getApprovedReviewById as getApprovedReviewByIdService,
   getApprovedReviewsByRestaurant as getApprovedReviewsByRestaurantService,
   getApprovedReviewsByMenuItem as getApprovedReviewsByMenuItemService,
 } from "../services/review.service.js";
@@ -120,7 +121,7 @@ export const getRestaurantReviews = async (
 
 export const getMenuItemReviews = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const menuItemId = Number(req.params.menuItemId);
@@ -133,8 +134,7 @@ export const getMenuItemReviews = async (
       return;
     }
 
-    const reviews =
-      await getApprovedReviewsByMenuItemService(menuItemId);
+    const reviews = await getApprovedReviewsByMenuItemService(menuItemId);
 
     res.status(200).json({
       success: true,
@@ -154,6 +154,45 @@ export const getMenuItemReviews = async (
     res.status(500).json({
       success: false,
       message: "Unable to fetch menu item reviews",
+    });
+  }
+};
+
+export const getReviewById = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const reviewId = Number(req.params.id);
+
+    if (Number.isNaN(reviewId)) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid review ID",
+      });
+      return;
+    }
+
+    const review = await getApprovedReviewByIdService(reviewId);
+
+    if (!review) {
+      res.status(404).json({
+        success: false,
+        message: "Review not found",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      data: review,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to fetch review",
     });
   }
 };

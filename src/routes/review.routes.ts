@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createReview } from "../controllers/review.controller.js";
+import { createReview,getReviewById } from "../controllers/review.controller.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 import { authorizeRoles } from "../middleware/role.middleware.js";
 
@@ -11,5 +11,6 @@ router.post(
   authorizeRoles("CUSTOMER"),
   createReview
 );
+router.get("/:id", getReviewById);
 
 export default router;

@@ -199,3 +199,39 @@ export const getApprovedReviewsByMenuItem = async (
     },
   });
 };
+
+export const getApprovedReviewById = async (reviewId: number) => {
+  return prisma.review.findFirst({
+    where: {
+      id: reviewId,
+      moderationStatus: "APPROVED",
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+      restaurant: {
+        select: {
+          id: true,
+          name: true,
+          city: true,
+        },
+      },
+      menuItem: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      ratings: {
+        include: {
+          ratingType: true,
+        },
+      },
+    },
+  });
+};
