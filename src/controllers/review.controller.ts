@@ -1,19 +1,19 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 import { AuthenticatedRequest } from "../middleware/auth.middleware.js";
 import { createReviewSchema } from "../validators/review.validator.js";
-import { createReview as createReviewService } from "../services/review.service.js";
+import {
+  createReview as createReviewService,
+  getApprovedReviewsByRestaurant as getApprovedReviewsByRestaurantService,
+} from "../services/review.service.js";
 
 export const createReview = async (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const validatedData = createReviewSchema.parse(req.body);
 
-    const review = await createReviewService(
-      req.user!.userId,
-      validatedData
-    );
+    const review = await createReviewService(req.user!.userId, validatedData);
 
     res.status(201).json({
       success: true,
@@ -74,6 +74,46 @@ export const createReview = async (
     res.status(400).json({
       success: false,
       message: "Unable to submit review",
+    });
+  }
+};
+
+export const getRestaurantReviews = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const restaurantId = Number(req.params.restaurantId);
+
+    if (Number.isNaN(restaurantId)) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid restaurant ID",
+      });
+      return;
+    }
+
+    const reviews =
+      await getApprovedReviewsByRestaurantService(restaurantId);
+
+    res.status(200).json({
+      success: true,
+      data: reviews,
+    });
+  } catch (error: any) {
+    if (error.message === "RESTAURANT_NOT_FOUND") {
+      res.status(404).json({
+        success: false,
+        message: "Restaurant not found",
+      });
+      return;
+    }
+
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to fetch restaurant reviews",
     });
   }
 };
