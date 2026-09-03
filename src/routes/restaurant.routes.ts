@@ -21,6 +21,7 @@ import {
   createRestaurantImage,
   deleteRestaurantImage,
 } from "../controllers/restaurant-image.controller.js";
+import { getRestaurantReviews ,getRestaurantRatingSummary} from "../controllers/review.controller.js";
 
 const router = Router();
 
@@ -69,6 +70,14 @@ router.delete(
   authenticate,
   authorizeRoles(ROLES.RESTAURANT_OWNER, ROLES.ADMIN),
   deleteRestaurantImage
+);
+router.get(
+  "/:restaurantId/reviews",
+  getRestaurantReviews
+);
+router.get(
+  "/:restaurantId/rating-summary",
+  getRestaurantRatingSummary
 );
 
 export default router;

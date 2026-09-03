@@ -1,0 +1,407 @@
+import prisma from "../config/prisma.js";
+
+interface RatingInput {
+  ratingTypeId: number;
+  ratingValue: number;
+}
+
+interface CreateReviewInput {
+  restaurantId: number;
+  menuItemId?: number;
+  title?: string;
+  reviewText: string;
+  ratings: RatingInput[];
+}
+
+export const createReview = async (
+  userId: number,
+  data: CreateReviewInput
+) => {
+  const restaurant = await prisma.restaurant.findUnique({
+    where: {
+      id: data.restaurantId,
+    },
+  });
+
+  if (!restaurant) {
+    throw new Error("RESTAURANT_NOT_FOUND");
+  }
+
+  if (restaurant.status !== "ACTIVE") {
+    throw new Error("RESTAURANT_NOT_ACTIVE");
+  }
+
+  if (data.menuItemId) {
+    const menuItem = await prisma.menuItem.findUnique({
+      where: {
+        id: data.menuItemId,
+      },
+    });
+
+    if (!menuItem) {
+      throw new Error("MENU_ITEM_NOT_FOUND");
+    }
+
+    if (menuItem.restaurantId !== data.restaurantId) {
+      throw new Error("INVALID_MENU_ITEM");
+    }
+  }
+
+  const ratingTypeIds = data.ratings.map(
+    (rating) => rating.ratingTypeId
+  );
+
+  const uniqueRatingTypeIds = new Set(ratingTypeIds);
+
+  if (uniqueRatingTypeIds.size !== ratingTypeIds.length) {
+    throw new Error("DUPLICATE_RATING_TYPE");
+  }
+
+  const ratingTypes = await prisma.ratingType.findMany({
+    where: {
+      id: {
+        in: ratingTypeIds,
+      },
+      isActive: true,
+    },
+  });
+
+  if (ratingTypes.length !== ratingTypeIds.length) {
+    throw new Error("INVALID_RATING_TYPE");
+  }
+
+  const overallRating =
+    data.ratings.reduce(
+      (total, rating) => total + rating.ratingValue,
+      0
+    ) / data.ratings.length;
+
+  return prisma.$transaction(async (tx) => {
+    const review = await tx.review.create({
+      data: {
+        userId,
+        restaurantId: data.restaurantId,
+        menuItemId: data.menuItemId,
+        title: data.title?.trim(),
+        reviewText: data.reviewText.trim(),
+        overallRating,
+        moderationStatus: "PENDING",
+      },
+    });
+
+    await tx.reviewRating.createMany({
+      data: data.ratings.map((rating) => ({
+        reviewId: review.id,
+        ratingTypeId: rating.ratingTypeId,
+        ratingValue: rating.ratingValue,
+      })),
+    });
+
+    return tx.review.findUnique({
+      where: {
+        id: review.id,
+      },
+      include: {
+        ratings: {
+          include: {
+            ratingType: true,
+          },
+        },
+      },
+    });
+  });
+};
+
+export const getApprovedReviewsByRestaurant = async (
+  restaurantId: number
+) => {
+  const restaurant = await prisma.restaurant.findUnique({
+    where: {
+      id: restaurantId,
+    },
+  });
+
+  if (!restaurant) {
+    throw new Error("RESTAURANT_NOT_FOUND");
+  }
+
+  return prisma.review.findMany({
+    where: {
+      restaurantId,
+      moderationStatus: "APPROVED",
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+      menuItem: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      ratings: {
+        include: {
+          ratingType: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+};
+
+export const getApprovedReviewsByMenuItem = async (
+  menuItemId: number
+) => {
+  const menuItem = await prisma.menuItem.findUnique({
+    where: {
+      id: menuItemId,
+    },
+  });
+
+  if (!menuItem) {
+    throw new Error("MENU_ITEM_NOT_FOUND");
+  }
+
+  return prisma.review.findMany({
+    where: {
+      menuItemId,
+      moderationStatus: "APPROVED",
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+      restaurant: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      ratings: {
+        include: {
+          ratingType: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+};
+
+export const getApprovedReviewById = async (reviewId: number) => {
+  return prisma.review.findFirst({
+    where: {
+      id: reviewId,
+      moderationStatus: "APPROVED",
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+      restaurant: {
+        select: {
+          id: true,
+          name: true,
+          city: true,
+        },
+      },
+      menuItem: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      ratings: {
+        include: {
+          ratingType: true,
+        },
+      },
+    },
+  });
+};
+
+export const getRestaurantRatingSummary = async (
+  restaurantId: number
+) => {
+  const restaurant = await prisma.restaurant.findUnique({
+    where: {
+      id: restaurantId,
+    },
+  });
+
+  if (!restaurant) {
+    throw new Error("RESTAURANT_NOT_FOUND");
+  }
+
+  const reviews = await prisma.review.findMany({
+    where: {
+      restaurantId,
+      moderationStatus: "APPROVED",
+    },
+    include: {
+      ratings: {
+        include: {
+          ratingType: true,
+        },
+      },
+    },
+  });
+
+  if (reviews.length === 0) {
+    return {
+      overallAverage: null,
+      reviewCount: 0,
+      ratingTypes: [],
+    };
+  }
+
+  const overallAverage =
+    reviews.reduce(
+      (total, review) =>
+        total + Number(review.overallRating ?? 0),
+      0
+    ) / reviews.length;
+
+  const ratingMap = new Map<
+    number,
+    {
+      name: string;
+      total: number;
+      count: number;
+    }
+  >();
+
+  for (const review of reviews) {
+    for (const rating of review.ratings) {
+      const existing = ratingMap.get(rating.ratingTypeId);
+
+      if (existing) {
+        existing.total += rating.ratingValue;
+        existing.count += 1;
+      } else {
+        ratingMap.set(rating.ratingTypeId, {
+          name: rating.ratingType.name,
+          total: rating.ratingValue,
+          count: 1,
+        });
+      }
+    }
+  }
+
+  const ratingTypes = Array.from(ratingMap.entries()).map(
+    ([ratingTypeId, value]) => ({
+      ratingTypeId,
+      name: value.name,
+      average: Number(
+        (value.total / value.count).toFixed(2)
+      ),
+    })
+  );
+
+  return {
+    overallAverage: Number(overallAverage.toFixed(2)),
+    reviewCount: reviews.length,
+    ratingTypes,
+  };
+};
+
+export const getMenuItemRatingSummary = async (
+  menuItemId: number
+) => {
+  const menuItem = await prisma.menuItem.findUnique({
+    where: {
+      id: menuItemId,
+    },
+  });
+
+  if (!menuItem) {
+    throw new Error("MENU_ITEM_NOT_FOUND");
+  }
+
+  const reviews = await prisma.review.findMany({
+    where: {
+      menuItemId,
+      moderationStatus: "APPROVED",
+    },
+    include: {
+      ratings: {
+        include: {
+          ratingType: true,
+        },
+      },
+    },
+  });
+
+  if (reviews.length === 0) {
+    return {
+      overallAverage: null,
+      reviewCount: 0,
+      ratingTypes: [],
+    };
+  }
+
+  const overallAverage =
+    reviews.reduce(
+      (total, review) =>
+        total + Number(review.overallRating ?? 0),
+      0
+    ) / reviews.length;
+
+  const ratingMap = new Map<
+    number,
+    {
+      name: string;
+      total: number;
+      count: number;
+    }
+  >();
+
+  for (const review of reviews) {
+    for (const rating of review.ratings) {
+      const existing = ratingMap.get(rating.ratingTypeId);
+
+      if (existing) {
+        existing.total += rating.ratingValue;
+        existing.count += 1;
+      } else {
+        ratingMap.set(rating.ratingTypeId, {
+          name: rating.ratingType.name,
+          total: rating.ratingValue,
+          count: 1,
+        });
+      }
+    }
+  }
+
+  const ratingTypes = Array.from(ratingMap.entries()).map(
+    ([ratingTypeId, value]) => ({
+      ratingTypeId,
+      name: value.name,
+      average: Number(
+        (value.total / value.count).toFixed(2)
+      ),
+    })
+  );
+
+  return {
+    overallAverage: Number(overallAverage.toFixed(2)),
+    reviewCount: reviews.length,
+    ratingTypes,
+  };
+};
