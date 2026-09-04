@@ -7,6 +7,7 @@ import menuCategoryRoutes from "./routes/menu-category.routes.js";
 import menuItemRoutes from "./routes/menu-item.routes.js";
 import ratingTypeRoutes from "./routes/rating-type.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
+import moderationRoutes from "./routes/moderation.routes.js";
 
 const app = express();
 
@@ -30,5 +31,6 @@ app.use("/api/menu-categories", menuCategoryRoutes);
 app.use("/api/menu-items", menuItemRoutes);
 app.use("/api/rating-types", ratingTypeRoutes);
 app.use("/api/reviews", reviewRoutes);
+app.use("/api/moderation", moderationRoutes);
 
 export default app;

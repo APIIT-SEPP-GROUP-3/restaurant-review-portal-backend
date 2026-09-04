@@ -1,4 +1,5 @@
 import type { Role } from "../constants/roles.js";
+import type { Request } from "express";
 
 export interface RegisterInput {
   firstName: string;
@@ -15,4 +16,8 @@ export interface LoginInput {
 export interface JwtPayload {
   userId: number;
   role: Role;
+}
+
+export interface AuthenticatedRequest extends Request {
+  user?: JwtPayload;
 }
