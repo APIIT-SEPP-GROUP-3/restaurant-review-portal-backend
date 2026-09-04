@@ -2,18 +2,7 @@ import prisma from "../config/prisma.js";
 import { generateToken } from "../utils/jwt.js";
 import { comparePassword, hashPassword } from "../utils/password.js";
 import { ROLES, Role } from "../constants/roles.js";
-
-interface RegisterInput {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-}
-
-interface LoginInput {
-  email: string;
-  password: string;
-}
+import type { LoginInput, RegisterInput } from "../types/auth.types.js";
 
 export const registerUser = async (data: RegisterInput) => {
   const email = data.email.trim().toLowerCase();

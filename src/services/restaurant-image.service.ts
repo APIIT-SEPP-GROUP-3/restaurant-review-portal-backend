@@ -1,17 +1,12 @@
 import prisma from "../config/prisma.js";
 import { ROLES, Role } from "../constants/roles.js";
-
-interface CreateRestaurantImageInput {
-  imageUrl: string;
-  altText?: string;
-  isPrimary?: boolean;
-}
+import type { CreateImageInput } from "../types/image.types.js";
 
 export const createRestaurantImage = async (
   restaurantId: number,
   userId: number,
   userRole: Role,
-  data: CreateRestaurantImageInput
+  data: CreateImageInput
 ) => {
   const restaurant = await prisma.restaurant.findUnique({
     where: {

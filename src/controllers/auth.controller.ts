@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { loginSchema, registerSchema } from "../validators/auth.validator.js";
 import { loginUser, registerUser,getCurrentUser } from "../services/auth.service.js";
-import { AuthenticatedRequest } from "../middleware/auth.middleware.js";
+import type { AuthenticatedRequest } from "../types/http.types.js";
 
 export const register = async (
   req: Request,

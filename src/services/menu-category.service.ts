@@ -1,10 +1,9 @@
 import prisma from "../config/prisma.js";
 import { ROLES, Role } from "../constants/roles.js";
-
-interface CreateMenuCategoryInput {
-  name: string;
-  displayOrder?: number;
-}
+import type {
+  CreateMenuCategoryInput,
+  UpdateMenuCategoryInput,
+} from "../types/menu-category.types.js";
 
 export const createMenuCategory = async (
   restaurantId: number,
@@ -60,11 +59,6 @@ export const getMenuCategoriesByRestaurant = async (
     },
   });
 };
-
-interface UpdateMenuCategoryInput {
-  name?: string;
-  displayOrder?: number;
-}
 
 export const updateMenuCategory = async (
   menuCategoryId: number,
