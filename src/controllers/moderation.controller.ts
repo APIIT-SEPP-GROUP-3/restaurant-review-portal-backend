@@ -1,10 +1,15 @@
 import { Response } from "express";
 import { AuthenticatedRequest } from "../types/auth.types.js";
-import { reviewModerationQuerySchema, rejectReviewSchema} from "../validators/moderation.validator.js";
+import {
+  reviewModerationQuerySchema,
+  rejectReviewSchema,
+  commentModerationQuerySchema,
+} from "../validators/moderation.validator.js";
 import {
   getReviewsForModeration as getReviewsForModerationService,
   approveReview as approveReviewService,
-  rejectReview as rejectReviewService
+  rejectReview as rejectReviewService,
+  getCommentsForModeration as getCommentsForModerationService,
 } from "../services/moderation.service.js";
 
 export const getReviewsForModeration = async (
@@ -32,7 +37,7 @@ export const getReviewsForModeration = async (
 
 export const approveReview = async (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const reviewId = Number(req.params.reviewId);
@@ -45,10 +50,7 @@ export const approveReview = async (
       return;
     }
 
-    const review = await approveReviewService(
-      reviewId,
-      req.user!.userId
-    );
+    const review = await approveReviewService(reviewId, req.user!.userId);
 
     res.status(200).json({
       success: true,
@@ -83,7 +85,7 @@ export const approveReview = async (
 
 export const rejectReview = async (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const reviewId = Number(req.params.reviewId);
@@ -101,7 +103,7 @@ export const rejectReview = async (
     const review = await rejectReviewService(
       reviewId,
       req.user!.userId,
-      validatedData.rejectionReason
+      validatedData.rejectionReason,
     );
 
     res.status(200).json({
@@ -131,6 +133,33 @@ export const rejectReview = async (
     res.status(400).json({
       success: false,
       message: "Unable to reject review",
+    });
+  }
+};
+
+export const getCommentsForModeration = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const validatedQuery =
+      commentModerationQuerySchema.parse(req.query);
+
+    const comments =
+      await getCommentsForModerationService(
+        validatedQuery.status
+      );
+
+    res.status(200).json({
+      success: true,
+      data: comments,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to fetch comments for moderation",
     });
   }
 };

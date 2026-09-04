@@ -1,5 +1,5 @@
 import prisma from "../config/prisma.js";
-import { ReviewStatus } from "../generated/prisma/client.js";
+import { ReviewStatus,CommentStatus } from "../generated/prisma/client.js";
 
 export const getReviewsForModeration = async (
   status: ReviewStatus
@@ -153,6 +153,56 @@ export const rejectReview = async (
           ratingType: true,
         },
       },
+    },
+  });
+};
+
+export const getCommentsForModeration = async (
+  status: CommentStatus
+) => {
+  return prisma.reviewComment.findMany({
+    where: {
+      moderationStatus: status,
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          role: {
+            select: {
+              roleName: true,
+            },
+          },
+        },
+      },
+
+      review: {
+        select: {
+          id: true,
+          title: true,
+          reviewText: true,
+          restaurant: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      },
+
+      parentComment: {
+        select: {
+          id: true,
+          commentText: true,
+        },
+      },
+    },
+
+    orderBy: {
+      createdAt: "asc",
     },
   });
 };
