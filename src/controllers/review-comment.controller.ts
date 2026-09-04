@@ -8,7 +8,7 @@ import {
 
 export const createReviewComment = async (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const reviewId = Number(req.params.reviewId);
@@ -21,19 +21,18 @@ export const createReviewComment = async (
       return;
     }
 
-    const validatedData =
-      createReviewCommentSchema.parse(req.body);
+    const validatedData = createReviewCommentSchema.parse(req.body);
 
     const comment = await createReviewCommentService(
       reviewId,
       req.user!.userId,
-      validatedData
+      req.user!.role,
+      validatedData,
     );
 
     res.status(201).json({
       success: true,
-      message:
-        "Comment submitted successfully and is awaiting moderation",
+      message: "Comment submitted successfully and is awaiting moderation",
       data: comment,
     });
   } catch (error: any) {
@@ -64,8 +63,16 @@ export const createReviewComment = async (
     if (error.message === "INVALID_PARENT_COMMENT") {
       res.status(400).json({
         success: false,
+        message: "Parent comment does not belong to this review",
+      });
+      return;
+    }
+
+    if (error.message === "FORBIDDEN") {
+      res.status(403).json({
+        success: false,
         message:
-          "Parent comment does not belong to this review",
+          "You are not allowed to respond to reviews for this restaurant",
       });
       return;
     }
@@ -81,7 +88,7 @@ export const createReviewComment = async (
 
 export const getReviewComments = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const reviewId = Number(req.params.reviewId);
@@ -94,8 +101,7 @@ export const getReviewComments = async (
       return;
     }
 
-    const comments =
-      await getApprovedCommentsByReviewService(reviewId);
+    const comments = await getApprovedCommentsByReviewService(reviewId);
 
     res.status(200).json({
       success: true,

@@ -8,6 +8,7 @@ interface CreateReviewCommentInput {
 export const createReviewComment = async (
   reviewId: number,
   userId: number,
+  userRole: string,
   data: CreateReviewCommentInput
 ) => {
   const review = await prisma.review.findUnique({
@@ -27,13 +28,21 @@ export const createReviewComment = async (
     throw new Error("REVIEW_NOT_APPROVED");
   }
 
+  // Restaurant owners can only respond to reviews
+  // belonging to restaurants they own.
+  if (
+    userRole === "RESTAURANT_OWNER" &&
+    review.restaurant.ownerId !== userId
+  ) {
+    throw new Error("FORBIDDEN");
+  }
+
   if (data.parentCommentId) {
-    const parentComment =
-      await prisma.reviewComment.findUnique({
-        where: {
-          id: data.parentCommentId,
-        },
-      });
+    const parentComment = await prisma.reviewComment.findUnique({
+      where: {
+        id: data.parentCommentId,
+      },
+    });
 
     if (!parentComment) {
       throw new Error("PARENT_COMMENT_NOT_FOUND");
