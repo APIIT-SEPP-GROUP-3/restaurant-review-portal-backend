@@ -1,4 +1,5 @@
 import prisma from "../config/prisma.js";
+import { ROLES, type Role } from "../constants/roles.js";
 
 interface CreateReviewCommentInput {
   commentText: string;
@@ -8,7 +9,7 @@ interface CreateReviewCommentInput {
 export const createReviewComment = async (
   reviewId: number,
   userId: number,
-  userRole: string,
+  userRole: Role,
   data: CreateReviewCommentInput
 ) => {
   const review = await prisma.review.findUnique({
@@ -31,7 +32,7 @@ export const createReviewComment = async (
   // Restaurant owners can only respond to reviews
   // belonging to restaurants they own.
   if (
-    userRole === "RESTAURANT_OWNER" &&
+    userRole === ROLES.RESTAURANT_OWNER &&
     review.restaurant.ownerId !== userId
   ) {
     throw new Error("FORBIDDEN");

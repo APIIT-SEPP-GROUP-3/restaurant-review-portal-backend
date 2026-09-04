@@ -9,17 +9,18 @@ import {
   createReviewComment,
   getReviewComments,
 } from "../controllers/review-comment.controller.js";
+import { ROLES } from "../constants/roles.js";
 
 const router = Router();
 
-router.post("/", authenticate, authorizeRoles("CUSTOMER"), createReview);
+router.post("/", authenticate, authorizeRoles(ROLES.CUSTOMER), createReview);
 
 router.get("/:id", getReviewById);
 
 router.post(
   "/:reviewId/comments",
   authenticate,
-  authorizeRoles("CUSTOMER", "RESTAURANT_OWNER", "ADMIN"),
+  authorizeRoles(ROLES.CUSTOMER, ROLES.RESTAURANT_OWNER, ROLES.ADMIN),
   createReviewComment,
 );
 
