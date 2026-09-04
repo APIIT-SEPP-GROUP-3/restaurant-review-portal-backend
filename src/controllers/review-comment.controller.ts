@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { AuthenticatedRequest } from "../middleware/auth.middleware.js";
+import type { AuthenticatedRequest } from "../types/http.types.js";
 import { createReviewCommentSchema } from "../validators/review-comment.validator.js";
 import {
   createReviewComment as createReviewCommentService,

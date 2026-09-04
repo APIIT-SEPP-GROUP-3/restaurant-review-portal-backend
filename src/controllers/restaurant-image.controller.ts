@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { AuthenticatedRequest } from "../middleware/auth.middleware.js";
+import type { AuthenticatedRequest } from "../types/http.types.js";
 import { createRestaurantImageSchema } from "../validators/restaurant-image.validator.js";
 import {
   createRestaurantImage as createRestaurantImageService,

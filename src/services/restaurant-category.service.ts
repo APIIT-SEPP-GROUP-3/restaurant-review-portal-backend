@@ -1,5 +1,6 @@
 import prisma from "../config/prisma.js";
 import { ROLES, Role } from "../constants/roles.js";
+import type { CreateRestaurantCategoryInput } from "../types/restaurant-category.types.js";
 
 export const getAllRestaurantCategories = async () => {
   return prisma.restaurantCategory.findMany({
@@ -70,11 +71,6 @@ export const assignCategoriesToRestaurant = async (
     },
   });
 };
-
-interface CreateRestaurantCategoryInput {
-  name: string;
-  description?: string;
-}
 
 export const createRestaurantCategory = async (
   data: CreateRestaurantCategoryInput

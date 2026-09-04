@@ -1,10 +1,5 @@
 import jwt from "jsonwebtoken";
-import { Role } from "../constants/roles.js";
-
-export interface JwtPayload {
-  userId: number;
-  role: Role;
-}
+import type { JwtPayload } from "../types/auth.types.js";
 
 export const generateToken = (payload: JwtPayload): string => {
   return jwt.sign(payload, process.env.JWT_SECRET!, {

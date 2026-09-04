@@ -1,4 +1,4 @@
-import { AuthenticatedRequest } from "../middleware/auth.middleware.js";
+import type { AuthenticatedRequest } from "../types/http.types.js";
 import {
   createMenuCategorySchema,
   updateMenuCategorySchema,

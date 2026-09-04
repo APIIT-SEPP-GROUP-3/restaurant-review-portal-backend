@@ -1,13 +1,10 @@
 import prisma from "../config/prisma.js";
 import { ROLES, Role } from "../constants/roles.js";
-
-interface CreateMenuItemInput {
-  menuCategoryId: number;
-  name: string;
-  description?: string;
-  price: number;
-  isAvailable?: boolean;
-}
+import type {
+  CreateMenuItemInput,
+  MenuItemSearchFilters,
+  UpdateMenuItemInput,
+} from "../types/menu-item.types.js";
 
 export const createMenuItem = async (
   restaurantId: number,
@@ -105,14 +102,6 @@ export const getMenuItemById = async (id: number) => {
     },
   });
 };
-
-interface UpdateMenuItemInput {
-  menuCategoryId?: number;
-  name?: string;
-  description?: string;
-  price?: number;
-  isAvailable?: boolean;
-}
 
 export const updateMenuItem = async (
   menuItemId: number,
@@ -215,17 +204,6 @@ export const updateMenuItemAvailability = async (
     },
   });
 };
-
-interface MenuItemSearchFilters {
-  search?: string;
-  restaurantId?: number;
-  menuCategoryId?: number;
-  isAvailable?: boolean;
-  page: number;
-  limit: number;
-  sortBy: "name" | "price" | "createdAt";
-  sortOrder: "asc" | "desc";
-}
 
 export const getMenuItems = async (
   filters: MenuItemSearchFilters

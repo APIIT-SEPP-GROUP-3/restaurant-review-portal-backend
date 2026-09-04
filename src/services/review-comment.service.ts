@@ -1,10 +1,6 @@
 import prisma from "../config/prisma.js";
 import { ROLES, type Role } from "../constants/roles.js";
-
-interface CreateReviewCommentInput {
-  commentText: string;
-  parentCommentId?: number;
-}
+import type { CreateReviewCommentInput } from "../types/review-comment.types.js";
 
 export const createReviewComment = async (
   reviewId: number,

@@ -1,17 +1,5 @@
 import prisma from "../config/prisma.js";
-
-interface RatingInput {
-  ratingTypeId: number;
-  ratingValue: number;
-}
-
-interface CreateReviewInput {
-  restaurantId: number;
-  menuItemId?: number;
-  title?: string;
-  reviewText: string;
-  ratings: RatingInput[];
-}
+import type { CreateReviewInput } from "../types/review.types.js";
 
 export const createReview = async (
   userId: number,

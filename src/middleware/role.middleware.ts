@@ -1,5 +1,5 @@
 import { NextFunction, Response } from "express";
-import { AuthenticatedRequest } from "./auth.middleware.js";
+import type { AuthenticatedRequest } from "../types/http.types.js";
 import { Role } from "../constants/roles.js";
 
 export const authorizeRoles = (...allowedRoles: Role[]) => {
