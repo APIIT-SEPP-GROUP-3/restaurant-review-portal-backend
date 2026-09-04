@@ -41,3 +41,60 @@ export const getReviewsForModeration = async (
     },
   });
 };
+
+export const approveReview = async (
+  reviewId: number,
+  moderatorId: number
+) => {
+  const review = await prisma.review.findUnique({
+    where: {
+      id: reviewId,
+    },
+  });
+
+  if (!review) {
+    throw new Error("REVIEW_NOT_FOUND");
+  }
+
+  if (review.moderationStatus !== "PENDING") {
+    throw new Error("REVIEW_NOT_PENDING");
+  }
+
+  return prisma.review.update({
+    where: {
+      id: reviewId,
+    },
+    data: {
+      moderationStatus: "APPROVED",
+      moderatedBy: moderatorId,
+      moderatedAt: new Date(),
+      rejectionReason: null,
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+      restaurant: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      menuItem: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      ratings: {
+        include: {
+          ratingType: true,
+        },
+      },
+    },
+  });
+};

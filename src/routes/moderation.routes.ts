@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getReviewsForModeration } from "../controllers/moderation.controller.js";
+import { getReviewsForModeration,approveReview } from "../controllers/moderation.controller.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 import { authorizeRoles } from "../middleware/role.middleware.js";
 import { ROLES } from "../constants/roles.js";
@@ -14,6 +14,16 @@ router.get(
     ROLES.ADMIN
   ),
   getReviewsForModeration
+);
+
+router.patch(
+  "/reviews/:reviewId/approve",
+  authenticate,
+  authorizeRoles(
+    ROLES.MODERATOR,
+    ROLES.ADMIN
+  ),
+  approveReview
 );
 
 export default router;

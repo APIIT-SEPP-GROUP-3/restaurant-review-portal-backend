@@ -1,20 +1,19 @@
 import { Response } from "express";
 import { AuthenticatedRequest } from "../types/auth.types.js";
 import { reviewModerationQuerySchema } from "../validators/moderation.validator.js";
-import { getReviewsForModeration as getReviewsForModerationService } from "../services/moderation.service.js";
+import {
+  getReviewsForModeration as getReviewsForModerationService,
+  approveReview as approveReviewService,
+} from "../services/moderation.service.js";
 
 export const getReviewsForModeration = async (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
-    const validatedQuery =
-      reviewModerationQuerySchema.parse(req.query);
+    const validatedQuery = reviewModerationQuerySchema.parse(req.query);
 
-    const reviews =
-      await getReviewsForModerationService(
-        validatedQuery.status
-      );
+    const reviews = await getReviewsForModerationService(validatedQuery.status);
 
     res.status(200).json({
       success: true,
@@ -26,6 +25,57 @@ export const getReviewsForModeration = async (
     res.status(500).json({
       success: false,
       message: "Unable to fetch reviews for moderation",
+    });
+  }
+};
+
+export const approveReview = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const reviewId = Number(req.params.reviewId);
+
+    if (Number.isNaN(reviewId)) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid review ID",
+      });
+      return;
+    }
+
+    const review = await approveReviewService(
+      reviewId,
+      req.user!.userId
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Review approved successfully",
+      data: review,
+    });
+  } catch (error: any) {
+    if (error.message === "REVIEW_NOT_FOUND") {
+      res.status(404).json({
+        success: false,
+        message: "Review not found",
+      });
+      return;
+    }
+
+    if (error.message === "REVIEW_NOT_PENDING") {
+      res.status(400).json({
+        success: false,
+        message: "Only pending reviews can be approved",
+      });
+      return;
+    }
+
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to approve review",
     });
   }
 };
