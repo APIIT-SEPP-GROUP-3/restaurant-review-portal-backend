@@ -214,6 +214,7 @@ model ReviewComment {
   moderationStatus CommentStatus @default(PENDING) @map("moderation_status")
   moderatedBy      Int?          @map("moderated_by")
   moderatedAt      DateTime?     @map("moderated_at")
+  rejectionReason  String?       @map("rejection_reason")
   createdAt        DateTime      @default(now()) @map("created_at")
   updatedAt        DateTime      @updatedAt @map("updated_at")
 

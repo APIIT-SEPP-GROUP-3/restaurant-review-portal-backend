@@ -4,6 +4,7 @@ import {
   reviewModerationQuerySchema,
   rejectReviewSchema,
   commentModerationQuerySchema,
+  rejectCommentSchema,
 } from "../validators/moderation.validator.js";
 import {
   getReviewsForModeration as getReviewsForModerationService,
@@ -11,6 +12,7 @@ import {
   rejectReview as rejectReviewService,
   getCommentsForModeration as getCommentsForModerationService,
   approveComment as approveCommentService,
+  rejectComment as rejectCommentService,
 } from "../services/moderation.service.js";
 
 export const getReviewsForModeration = async (
@@ -212,6 +214,61 @@ export const approveComment = async (
     res.status(500).json({
       success: false,
       message: "Unable to approve comment",
+    });
+  }
+};
+
+export const rejectComment = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const commentId = Number(req.params.commentId);
+
+    if (Number.isNaN(commentId)) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid comment ID",
+      });
+      return;
+    }
+
+    const validatedData =
+      rejectCommentSchema.parse(req.body);
+
+    const comment = await rejectCommentService(
+      commentId,
+      req.user!.userId,
+      validatedData.rejectionReason
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Comment rejected successfully",
+      data: comment,
+    });
+  } catch (error: any) {
+    if (error.message === "COMMENT_NOT_FOUND") {
+      res.status(404).json({
+        success: false,
+        message: "Comment not found",
+      });
+      return;
+    }
+
+    if (error.message === "COMMENT_NOT_PENDING") {
+      res.status(400).json({
+        success: false,
+        message: "Only pending comments can be rejected",
+      });
+      return;
+    }
+
+    console.error(error);
+
+    res.status(400).json({
+      success: false,
+      message: "Unable to reject comment",
     });
   }
 };
