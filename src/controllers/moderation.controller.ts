@@ -10,6 +10,7 @@ import {
   approveReview as approveReviewService,
   rejectReview as rejectReviewService,
   getCommentsForModeration as getCommentsForModerationService,
+  approveComment as approveCommentService,
 } from "../services/moderation.service.js";
 
 export const getReviewsForModeration = async (
@@ -160,6 +161,57 @@ export const getCommentsForModeration = async (
     res.status(500).json({
       success: false,
       message: "Unable to fetch comments for moderation",
+    });
+  }
+};
+
+export const approveComment = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  try {
+    const commentId = Number(req.params.commentId);
+
+    if (Number.isNaN(commentId)) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid comment ID",
+      });
+      return;
+    }
+
+    const comment = await approveCommentService(
+      commentId,
+      req.user!.userId
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Comment approved successfully",
+      data: comment,
+    });
+  } catch (error: any) {
+    if (error.message === "COMMENT_NOT_FOUND") {
+      res.status(404).json({
+        success: false,
+        message: "Comment not found",
+      });
+      return;
+    }
+
+    if (error.message === "COMMENT_NOT_PENDING") {
+      res.status(400).json({
+        success: false,
+        message: "Only pending comments can be approved",
+      });
+      return;
+    }
+
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Unable to approve comment",
     });
   }
 };

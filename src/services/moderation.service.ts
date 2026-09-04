@@ -206,3 +206,65 @@ export const getCommentsForModeration = async (
     },
   });
 };
+
+export const approveComment = async (
+  commentId: number,
+  moderatorId: number
+) => {
+  const comment = await prisma.reviewComment.findUnique({
+    where: {
+      id: commentId,
+    },
+  });
+
+  if (!comment) {
+    throw new Error("COMMENT_NOT_FOUND");
+  }
+
+  if (comment.moderationStatus !== "PENDING") {
+    throw new Error("COMMENT_NOT_PENDING");
+  }
+
+  return prisma.reviewComment.update({
+    where: {
+      id: commentId,
+    },
+    data: {
+      moderationStatus: "APPROVED",
+      moderatedBy: moderatorId,
+      moderatedAt: new Date(),
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          role: {
+            select: {
+              roleName: true,
+            },
+          },
+        },
+      },
+      review: {
+        select: {
+          id: true,
+          title: true,
+          restaurant: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      },
+      parentComment: {
+        select: {
+          id: true,
+          commentText: true,
+        },
+      },
+    },
+  });
+};

@@ -4,6 +4,7 @@ import {
   approveReview,
   rejectReview,
   getCommentsForModeration,
+  approveComment,
 } from "../controllers/moderation.controller.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 import { authorizeRoles } from "../middleware/role.middleware.js";
@@ -37,6 +38,13 @@ router.get(
   authenticate,
   authorizeRoles(ROLES.MODERATOR, ROLES.ADMIN),
   getCommentsForModeration,
+);
+
+router.patch(
+  "/comments/:commentId/approve",
+  authenticate,
+  authorizeRoles(ROLES.MODERATOR, ROLES.ADMIN),
+  approveComment,
 );
 
 export default router;
