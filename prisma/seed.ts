@@ -2,6 +2,7 @@ import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client.js";
 import { ROLES } from "../src/constants/roles.js";
+import { seedDemo } from "./seed-demo.js";
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
@@ -84,13 +85,16 @@ async function main() {
     });
   }
 
+  if (process.argv.includes("--demo")) {
+    await seedDemo(prisma);
+  }
   console.log("Database seed completed successfully.");
 }
 
 main()
   .catch((error) => {
     console.error(error);
-    process.exit(1);
+    process.exitCode = 1;
   })
   .finally(async () => {
     await prisma.$disconnect();

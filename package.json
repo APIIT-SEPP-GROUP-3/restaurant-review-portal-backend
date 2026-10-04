@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "db:seed": "tsx prisma/seed.ts",
+    "db:seed:demo": "tsx prisma/seed.ts --demo",
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "lint": "eslint .",
