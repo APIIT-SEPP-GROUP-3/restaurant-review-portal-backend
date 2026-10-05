@@ -1,0 +1,16 @@
+export default {
+  testEnvironment: "node",
+  watchman: false,
+  testMatch: ["<rootDir>/tests/**/*.test.ts"],
+  extensionsToTreatAsEsm: [".ts"],
+  transform: { "^.+\\.ts$": "<rootDir>/tests/support/transformer.cjs" },
+  moduleNameMapper: { "^(\\.{1,2}/.*)\\.js$": "$1" },
+  setupFiles: ["<rootDir>/tests/support/environment.mjs"],
+  setupFilesAfterEnv: ["<rootDir>/tests/support/setup.ts"],
+  globalSetup: "<rootDir>/tests/support/migrate.mjs",
+  maxWorkers: 1,
+  testTimeout: 15000,
+  coverageProvider: "v8",
+  collectCoverageFrom: ["src/**/*.ts", "!src/generated/**", "!src/types/**", "!src/server.ts"],
+  coverageDirectory: "coverage",
+};
