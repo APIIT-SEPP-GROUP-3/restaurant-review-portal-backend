@@ -8,7 +8,7 @@ export function configureTestEnvironment() {
   const inherited = process.env.DATABASE_URL;
   config({ path: ".env.test", quiet: true });
   const value = process.env.TEST_DATABASE_URL;
-  if (!value) throw new Error("TEST_DATABASE_URL is required; no DATABASE_URL fallback is allowed");
+  if (!value) throw new Error("TEST_DATABASE_URL is required. Set it in .env.test or export it before running npm test. See tests/README.md for dedicated PostgreSQL setup; no DATABASE_URL fallback is allowed.");
   const url = new URL(value);
   const database = decodeURIComponent(url.pathname.slice(1));
   if (!["postgres:", "postgresql:"].includes(url.protocol) || !/(^|_)test$/.test(database)) {
