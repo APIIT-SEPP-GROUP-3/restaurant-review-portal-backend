@@ -204,6 +204,33 @@ Sensitive information such as database passwords, API keys, and authentication s
 
 ## Frontend Integration
 
+### Demo data for frontend testing
+
+Run `npm run db:seed:demo` to populate all 13 application tables in the database
+configured by `DATABASE_URL`. This preserves existing records and skips demo
+restaurants already present, so rerunning does not duplicate the demo dataset.
+Reruns replace the original Picsum demo placeholders with relevant photos.
+The script also advances ID sequences if imported records left them behind.
+Use `npm run db:seed` for only the original roles and rating types.
+
+The demo includes six restaurants (five active, one inactive), menus with
+available and unavailable items, relevant public food and dining image URLs, ratings,
+approved/pending/rejected reviews and comments, and comment replies. Images are
+stock photos rather than photos of actual demo venues. Sources and attribution
+are listed in [image credits](prisma/demo-image-credits.md). Demo menu prices are in LKR.
+
+All new demo accounts use password `DemoPass123!`:
+
+| Role | Email |
+| --- | --- |
+| Customer | customer@demo.example |
+| Second customer | customer2@demo.example |
+| Restaurant owner | owner@demo.example |
+| Moderator | moderator@demo.example |
+| Admin | admin@demo.example |
+
+Existing demo accounts retain their passwords and role settings on reruns.
+
 The backend is designed to communicate with the Restaurant Review Portal frontend application.
 
 Frontend repository:
