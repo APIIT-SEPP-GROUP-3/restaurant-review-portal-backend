@@ -128,9 +128,11 @@ model RestaurantImage {
   id           Int      @id @default(autoincrement())
   restaurantId Int      @map("restaurant_id")
   imageUrl     String   @map("image_url")
+  objectKey    String?  @map("object_key")
   altText      String?  @map("alt_text")
   isPrimary    Boolean  @default(false) @map("is_primary")
   createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
 
@@ -141,9 +143,11 @@ model MenuItemImage {
   id         Int      @id @default(autoincrement())
   menuItemId Int      @map("menu_item_id")
   imageUrl   String   @map("image_url")
+  objectKey  String?  @map("object_key")
   altText    String?  @map("alt_text")
   isPrimary  Boolean  @default(false) @map("is_primary")
   createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
   menuItem MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
 
