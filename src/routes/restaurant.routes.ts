@@ -3,7 +3,7 @@ import {
   createRestaurant,
   getRestaurantById,
   updateRestaurant,
-  getRestaurants
+  getRestaurants,
 } from "../controllers/restaurant.controller.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 import { authorizeRoles } from "../middleware/role.middleware.js";
@@ -21,7 +21,11 @@ import {
   createRestaurantImage,
   deleteRestaurantImage,
 } from "../controllers/restaurant-image.controller.js";
-import { getRestaurantReviews ,getRestaurantRatingSummary} from "../controllers/review.controller.js";
+import {
+  getRestaurantReviews,
+  getRestaurantRatingSummary,
+} from "../controllers/review.controller.js";
+import { presignRestaurantImageUpload, saveRestaurantImage } from "../controllers/image-upload.controller.js";
 
 const router = Router();
 
@@ -59,25 +63,40 @@ router.post(
   createMenuItem,
 );
 router.get("/:restaurantId/menu-items", getMenuItemsByRestaurant);
+// router.post(
+//   "/:restaurantId/images",
+//   authenticate,
+//   authorizeRoles(ROLES.RESTAURANT_OWNER, ROLES.ADMIN),
+//   createRestaurantImage,
+// );
+// router.delete(
+//   "/:restaurantId/images/:imageId",
+//   authenticate,
+//   authorizeRoles(ROLES.RESTAURANT_OWNER, ROLES.ADMIN),
+//   deleteRestaurantImage,
+// );
+router.get("/:restaurantId/reviews", getRestaurantReviews);
+router.get("/:restaurantId/rating-summary", getRestaurantRatingSummary);
+
+router.post(
+  "/:restaurantId/images/presign",
+  authenticate,
+  authorizeRoles(ROLES.RESTAURANT_OWNER, ROLES.ADMIN),
+  presignRestaurantImageUpload,
+);
+
 router.post(
   "/:restaurantId/images",
   authenticate,
   authorizeRoles(ROLES.RESTAURANT_OWNER, ROLES.ADMIN),
-  createRestaurantImage,
+  saveRestaurantImage,
 );
+
 router.delete(
   "/:restaurantId/images/:imageId",
   authenticate,
   authorizeRoles(ROLES.RESTAURANT_OWNER, ROLES.ADMIN),
-  deleteRestaurantImage
-);
-router.get(
-  "/:restaurantId/reviews",
-  getRestaurantReviews
-);
-router.get(
-  "/:restaurantId/rating-summary",
-  getRestaurantRatingSummary
+  deleteRestaurantImage,
 );
 
 export default router;
