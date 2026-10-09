@@ -208,16 +208,24 @@ Sensitive information such as database passwords, API keys, and authentication s
 
 ## Frontend Integration
 
-### Demo data for frontend testing
+### Sri Lankan sample data for frontend testing
 
-Run `npm run db:seed:demo` to populate all 13 application tables in the database
-configured by `DATABASE_URL`. This preserves existing records and skips demo
-restaurants already present, so rerunning does not duplicate the demo dataset.
-Reruns replace the original Picsum demo placeholders with relevant photos.
+Run `npm run db:seed:local` to populate all 13 application tables in the database
+configured by `DATABASE_URL`. `npm run db:seed:demo` remains an alias for the same dataset.
+The six fictional venues are Cinnamon Gedara, Kandyan Bath Kade, Galle Muhudu Rasa,
+Yaal Pachchai Kitchen, Udarata Tea Room and Negombo Wel Thera. Their menus contain
+53 items across breakfast, mains, desserts and drinks, with sample prices in LKR.
+They include chicken kottu, rice and curry, pol roti, kiribath, string hoppers,
+kadala curry, seafood and watalappan, alongside cafe favourites.
+
+Reruns update the seed-owned restaurant names, addresses, descriptions and menus
+in place, including the old `Demo` names, without duplicating the dataset.
+Existing restaurant/menu IDs, reviews, replies and unrelated records are retained.
+Uploaded R2 photos and custom image URLs are preserved; known seed photos are refreshed.
 The script also advances ID sequences if imported records left them behind.
 Use `npm run db:seed` for only the original roles and rating types.
 
-The demo includes six restaurants (five active, one inactive), menus with
+The dataset includes six restaurants (five active, one inactive), menus with
 available and unavailable items, relevant public food and dining image URLs, ratings,
 approved/pending/rejected reviews and comments, and comment replies. Images are
 stock photos rather than photos of actual demo venues. Sources and attribution

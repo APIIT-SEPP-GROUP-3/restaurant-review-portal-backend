@@ -4,11 +4,14 @@ Photos illustrate sample dishes and venues; they are not photos of real demo res
 
 ## Wikimedia Commons
 
-These three photos are used unchanged under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Retain these credits with the demo and display them in a frontend image-credit view when sharing it.
+The first three photos are used unchanged under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Licenses for the additional photos are listed below. Retain these credits with the sample data and display them in a frontend image-credit view when sharing it.
 
 - Chicken Kottu — Dan arndt: https://commons.wikimedia.org/wiki/File:Chicken_Kottu.jpg
 - Rice and Curry — Krankman; shadow adjustment by Ubcule in the source image: https://commons.wikimedia.org/wiki/File:SL-rice_and_curry.jpg
 - Coconut Roti — Ralbahitha: https://commons.wikimedia.org/wiki/File:Coconut_Roti.jpg
+- Kiribath — AntanO; source cropped by Hohum, CC BY-SA 4.0: https://commons.wikimedia.org/wiki/File:Kiribath.jpg
+- String Hoppers — Ji-Elle, [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/): https://commons.wikimedia.org/wiki/File:Sri_Lanka-String_hoppers.jpg
+- Watalappan — Ji-Elle, [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/): https://commons.wikimedia.org/wiki/File:Watalappan-Sri_Lanka.jpg
 
 ## Pexels
 

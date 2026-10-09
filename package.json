@@ -6,6 +6,7 @@
   "scripts": {
     "db:seed": "tsx prisma/seed.ts",
     "db:seed:demo": "tsx prisma/seed.ts --demo",
+    "db:seed:local": "tsx prisma/seed.ts --local",
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "lint": "eslint .",
