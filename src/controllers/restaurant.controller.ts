@@ -20,7 +20,7 @@ export const createRestaurant = async (
     const validatedData = createRestaurantSchema.parse(req.body);
 
     const restaurant = await createRestaurantService(
-      req.user!.userId,
+      validatedData.ownerId,
       validatedData,
     );
 

@@ -85,7 +85,7 @@ async function main() {
     });
   }
 
-  if (process.argv.includes("--demo")) {
+  if (process.argv.includes("--demo") || process.argv.includes("--local")) {
     await seedDemo(prisma);
   }
   console.log("Database seed completed successfully.");

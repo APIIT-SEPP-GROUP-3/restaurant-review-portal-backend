@@ -3,6 +3,9 @@
 const pexels = (id: number) => `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=960`;
 
 export const dishImages: Record<string, string> = {
+  "Kiribath": "https://upload.wikimedia.org/wikipedia/commons/f/fc/Kiribath.jpg",
+  "String Hoppers": "https://upload.wikimedia.org/wikipedia/commons/6/6d/Sri_Lanka-String_hoppers.jpg",
+  "Watalappan": "https://upload.wikimedia.org/wikipedia/commons/8/81/Watalappan-Sri_Lanka.jpg",
   "Chicken Kottu": "https://upload.wikimedia.org/wikipedia/commons/a/a3/Chicken_Kottu.jpg",
   "Rice and Curry": "https://upload.wikimedia.org/wikipedia/commons/8/86/SL-rice_and_curry.jpg",
   "Coconut Roti": "https://upload.wikimedia.org/wikipedia/commons/4/4e/Coconut_Roti.jpg",

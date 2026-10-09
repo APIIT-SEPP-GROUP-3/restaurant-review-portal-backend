@@ -22,7 +22,7 @@ export const createMenuItemImage = async (
   }
 
   if (
-    userRole !== ROLES.ADMIN &&
+    userRole !== ROLES.RESTAURANT_OWNER ||
     menuItem.restaurant.ownerId !== userId
   ) {
     throw new Error("FORBIDDEN");
@@ -69,7 +69,7 @@ export const deleteMenuItemImage = async (
     throw new Error("MENU_ITEM_NOT_FOUND");
   }
 
-  if (userRole !== ROLES.ADMIN && menuItem.restaurant.ownerId !== userId) {
+  if (userRole !== ROLES.RESTAURANT_OWNER || menuItem.restaurant.ownerId !== userId) {
     throw new Error("FORBIDDEN");
   }
 
