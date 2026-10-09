@@ -13,9 +13,11 @@ describe("role authorization and ownership", () => {
     expect(await prisma.restaurant.count()).toBe(0);
     expect(await prisma.restaurantCategory.count()).toBe(0);
   });
-  test("owner can create and update their own restaurant", async () => {
+  test("admin creates a restaurant assigned to an owner; owner can edit it", async () => {
     const owner = await actor(ROLES.RESTAURANT_OWNER);
-    const created = await request(app).post("/api/restaurants").auth(owner.token, { type: "bearer" }).send({ name: "Test Place", address: "123 Road", city: "Colombo" }).expect(201);
+    const admin = await actor(ROLES.ADMIN);
+    await request(app).post("/api/restaurants").auth(owner.token, { type: "bearer" }).send({}).expect(403);
+    const created = await request(app).post("/api/restaurants").auth(admin.token, { type: "bearer" }).send({ ownerId: owner.id, name: "Test Place", address: "123 Road", city: "Colombo" }).expect(201);
     expect(created.body.data.ownerId).toBe(owner.id);
     await request(app).put(`/api/restaurants/${created.body.data.id}`).auth(owner.token, { type: "bearer" }).send({ name: "Updated Place" }).expect(200);
     expect((await prisma.restaurant.findUniqueOrThrow({ where: { id: created.body.data.id } })).name).toBe("Updated Place");
@@ -27,7 +29,7 @@ describe("role authorization and ownership", () => {
     await request(app).put(`/api/restaurants/${place.id}`).auth(owner.token, { type: "bearer" }).send({ name: "Unauthorized change" }).expect(403);
     expect(await prisma.restaurant.findUniqueOrThrow({ where: { id: place.id } })).toEqual(place);
   });
-  test.each([ROLES.MODERATOR, ROLES.ADMIN])("%s can access moderation endpoints", async (role) => {
+  test.each([ROLES.MODERATOR])("%s can access moderation endpoints", async (role) => {
     const moderator = await actor(role);
     for (const resource of ["reviews", "comments"]) {
       const response = await request(app).get(`/api/moderation/${resource}`).auth(moderator.token, { type: "bearer" }).expect(200);

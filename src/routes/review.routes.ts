@@ -20,7 +20,7 @@ router.get("/:id", getReviewById);
 router.post(
   "/:reviewId/comments",
   authenticate,
-  authorizeRoles(ROLES.CUSTOMER, ROLES.RESTAURANT_OWNER, ROLES.ADMIN),
+  authorizeRoles(ROLES.CUSTOMER, ROLES.RESTAURANT_OWNER),
   createReviewComment,
 );
 

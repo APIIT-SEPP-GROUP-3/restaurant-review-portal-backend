@@ -27,7 +27,7 @@ export const assignCategoriesToRestaurant = async (
   }
 
   if (
-    userRole !== ROLES.ADMIN &&
+    userRole !== ROLES.RESTAURANT_OWNER ||
     restaurant.ownerId !== userId
   ) {
     throw new Error("FORBIDDEN");

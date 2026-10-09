@@ -35,7 +35,7 @@ const verifyRestaurantOwnership = async (
     throw new Error("RESTAURANT_NOT_FOUND");
   }
 
-  if (userRole !== ROLES.ADMIN && restaurant.ownerId !== userId) {
+  if (userRole !== ROLES.RESTAURANT_OWNER || restaurant.ownerId !== userId) {
     throw new Error("FORBIDDEN");
   }
 
@@ -65,7 +65,7 @@ const getOwnedMenuItem = async (
     throw new Error("MENU_ITEM_NOT_FOUND");
   }
 
-  if (userRole !== ROLES.ADMIN && menuItem.restaurant.ownerId !== userId) {
+  if (userRole !== ROLES.RESTAURANT_OWNER || menuItem.restaurant.ownerId !== userId) {
     throw new Error("FORBIDDEN");
   }
 

@@ -19,7 +19,7 @@ export const createRestaurantImage = async (
   }
 
   if (
-    userRole !== ROLES.ADMIN &&
+    userRole !== ROLES.RESTAURANT_OWNER ||
     restaurant.ownerId !== userId
   ) {
     throw new Error("FORBIDDEN");
@@ -63,7 +63,7 @@ export const deleteRestaurantImage = async (
     throw new Error("RESTAURANT_NOT_FOUND");
   }
 
-  if (userRole !== ROLES.ADMIN && restaurant.ownerId !== userId) {
+  if (userRole !== ROLES.RESTAURANT_OWNER || restaurant.ownerId !== userId) {
     throw new Error("FORBIDDEN");
   }
 

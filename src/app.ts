@@ -9,6 +9,8 @@ import ratingTypeRoutes from "./routes/rating-type.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
 import moderationRoutes from "./routes/moderation.routes.js";
 
+import managementRoutes, { accountRoutes } from "./routes/management.routes.js";
+
 const app = express();
 
 const allowedOrigins = ["http://localhost:3000", "https://dinerate.xyz"];
@@ -38,6 +40,8 @@ app.get("/api/health", (_req, res) => {
   });
 });
 
+app.use("/api/admin", managementRoutes);
+app.use("/api/me", accountRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/restaurant-categories", restaurantCategoryRoutes);

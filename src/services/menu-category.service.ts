@@ -22,7 +22,7 @@ export const createMenuCategory = async (
   }
 
   if (
-    userRole !== ROLES.ADMIN &&
+    userRole !== ROLES.RESTAURANT_OWNER ||
     restaurant.ownerId !== userId
   ) {
     throw new Error("FORBIDDEN");
@@ -80,7 +80,7 @@ export const updateMenuCategory = async (
   }
 
   if (
-    userRole !== ROLES.ADMIN &&
+    userRole !== ROLES.RESTAURANT_OWNER ||
     menuCategory.restaurant.ownerId !== userId
   ) {
     throw new Error("FORBIDDEN");

@@ -25,6 +25,9 @@ export const createReviewComment = async (
     throw new Error("REVIEW_NOT_APPROVED");
   }
 
+  if (userRole === ROLES.CUSTOMER && review.userId === userId) {
+    throw new Error("FORBIDDEN");
+  }
   // Restaurant owners can only respond to reviews
   // belonging to restaurants they own.
   if (
@@ -45,7 +48,7 @@ export const createReviewComment = async (
       throw new Error("PARENT_COMMENT_NOT_FOUND");
     }
 
-    if (parentComment.reviewId !== reviewId) {
+    if (parentComment.reviewId !== reviewId || parentComment.moderationStatus !== "APPROVED") {
       throw new Error("INVALID_PARENT_COMMENT");
     }
   }
