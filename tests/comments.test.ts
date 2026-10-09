@@ -8,7 +8,9 @@ describe("comments and owner responses", () => {
   test("customer and restaurant owner comments start pending; another owner is forbidden", async () => {
     const f = await reviewFixture("APPROVED");
     const other = await actor(ROLES.RESTAURANT_OWNER, "other");
-    for (const user of [f.customer, f.owner]) {
+    const commenter = await actor(ROLES.CUSTOMER, "commenter");
+    await request(app).post(`/api/reviews/${f.review.id}/comments`).auth(f.customer.token, { type: "bearer" }).send({ commentText: "Self comment" }).expect(403);
+    for (const user of [commenter, f.owner]) {
       const response = await request(app).post(`/api/reviews/${f.review.id}/comments`).auth(user.token, { type: "bearer" }).send({ commentText: "Thank you for the review" }).expect(201);
       expect(response.body.data).toMatchObject({ moderationStatus: "PENDING", userId: user.id });
       expect((await prisma.reviewComment.findUniqueOrThrow({ where: { id: response.body.data.id } })).moderationStatus).toBe("PENDING");

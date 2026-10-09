@@ -32,7 +32,7 @@ const router = Router();
 router.post(
   "/",
   authenticate,
-  authorizeRoles(ROLES.RESTAURANT_OWNER, ROLES.ADMIN),
+  authorizeRoles(ROLES.ADMIN),
   createRestaurant,
 );
 router.get("/", getRestaurants);
@@ -46,33 +46,33 @@ router.put(
 router.put(
   "/:restaurantId/categories",
   authenticate,
-  authorizeRoles(ROLES.RESTAURANT_OWNER, ROLES.ADMIN),
+  authorizeRoles(ROLES.RESTAURANT_OWNER),
   updateRestaurantCategories,
 );
 router.post(
   "/:restaurantId/menu-categories",
   authenticate,
-  authorizeRoles(ROLES.RESTAURANT_OWNER, ROLES.ADMIN),
+  authorizeRoles(ROLES.RESTAURANT_OWNER),
   createMenuCategory,
 );
 router.get("/:restaurantId/menu-categories", getMenuCategoriesByRestaurant);
 router.post(
   "/:restaurantId/menu-items",
   authenticate,
-  authorizeRoles(ROLES.RESTAURANT_OWNER, ROLES.ADMIN),
+  authorizeRoles(ROLES.RESTAURANT_OWNER),
   createMenuItem,
 );
 router.get("/:restaurantId/menu-items", getMenuItemsByRestaurant);
 // router.post(
 //   "/:restaurantId/images",
 //   authenticate,
-//   authorizeRoles(ROLES.RESTAURANT_OWNER, ROLES.ADMIN),
+//   authorizeRoles(ROLES.RESTAURANT_OWNER),
 //   createRestaurantImage,
 // );
 // router.delete(
 //   "/:restaurantId/images/:imageId",
 //   authenticate,
-//   authorizeRoles(ROLES.RESTAURANT_OWNER, ROLES.ADMIN),
+//   authorizeRoles(ROLES.RESTAURANT_OWNER),
 //   deleteRestaurantImage,
 // );
 router.get("/:restaurantId/reviews", getRestaurantReviews);
@@ -81,21 +81,21 @@ router.get("/:restaurantId/rating-summary", getRestaurantRatingSummary);
 router.post(
   "/:restaurantId/images/presign",
   authenticate,
-  authorizeRoles(ROLES.RESTAURANT_OWNER, ROLES.ADMIN),
+  authorizeRoles(ROLES.RESTAURANT_OWNER),
   presignRestaurantImageUpload,
 );
 
 router.post(
   "/:restaurantId/images",
   authenticate,
-  authorizeRoles(ROLES.RESTAURANT_OWNER, ROLES.ADMIN),
+  authorizeRoles(ROLES.RESTAURANT_OWNER),
   saveRestaurantImage,
 );
 
 router.delete(
   "/:restaurantId/images/:imageId",
   authenticate,
-  authorizeRoles(ROLES.RESTAURANT_OWNER, ROLES.ADMIN),
+  authorizeRoles(ROLES.RESTAURANT_OWNER),
   deleteRestaurantImage,
 );
 

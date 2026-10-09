@@ -22,7 +22,7 @@ export const createMenuItem = async (
     throw new Error("RESTAURANT_NOT_FOUND");
   }
 
-  if (userRole !== ROLES.ADMIN && restaurant.ownerId !== userId) {
+  if (userRole !== ROLES.RESTAURANT_OWNER || restaurant.ownerId !== userId) {
     throw new Error("FORBIDDEN");
   }
 
@@ -123,7 +123,7 @@ export const updateMenuItem = async (
   }
 
   if (
-    userRole !== ROLES.ADMIN &&
+    userRole !== ROLES.RESTAURANT_OWNER ||
     menuItem.restaurant.ownerId !== userId
   ) {
     throw new Error("FORBIDDEN");
@@ -189,7 +189,7 @@ export const updateMenuItemAvailability = async (
   }
 
   if (
-    userRole !== ROLES.ADMIN &&
+    userRole !== ROLES.RESTAURANT_OWNER ||
     menuItem.restaurant.ownerId !== userId
   ) {
     throw new Error("FORBIDDEN");

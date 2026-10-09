@@ -63,6 +63,7 @@ export const approveReview = async (
   return prisma.review.update({
     where: {
       id: reviewId,
+      moderationStatus: "PENDING",
     },
     data: {
       moderationStatus: "APPROVED",
@@ -121,6 +122,7 @@ export const rejectReview = async (
   return prisma.review.update({
     where: {
       id: reviewId,
+      moderationStatus: "PENDING",
     },
     data: {
       moderationStatus: "REJECTED",
@@ -228,6 +230,7 @@ export const approveComment = async (
   return prisma.reviewComment.update({
     where: {
       id: commentId,
+      moderationStatus: "PENDING",
     },
     data: {
       moderationStatus: "APPROVED",
@@ -291,6 +294,7 @@ export const rejectComment = async (
   return prisma.reviewComment.update({
     where: {
       id: commentId,
+      moderationStatus: "PENDING",
     },
     data: {
       moderationStatus: "REJECTED",

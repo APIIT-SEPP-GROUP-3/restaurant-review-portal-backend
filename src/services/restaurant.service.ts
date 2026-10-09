@@ -10,6 +10,10 @@ export const createRestaurant = async (
   ownerId: number,
   data: CreateRestaurantInput
 ) => {
+  const owner = await prisma.user.findUnique({ where: { id: ownerId }, include: { role: true } });
+  if (!owner || !owner.isActive || !owner.role.isActive || owner.role.roleName !== ROLES.RESTAURANT_OWNER) {
+    throw new Error("INVALID_RESTAURANT_OWNER");
+  }
   return prisma.restaurant.create({
     data: {
       ownerId,
@@ -26,8 +30,9 @@ export const createRestaurant = async (
 };
 
 export const getRestaurantById = async (id: number) => {
-  return prisma.restaurant.findUnique({
+  return prisma.restaurant.findFirst({
     where: {
+      status: "ACTIVE",
       id,
     },
     include: {

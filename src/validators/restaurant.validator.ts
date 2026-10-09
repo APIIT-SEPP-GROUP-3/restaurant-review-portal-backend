@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const createRestaurantSchema = z.object({
+  ownerId: z.number().int().positive(),
   name: z.string().min(2).max(150),
   description: z.string().max(1000).optional(),
   address: z.string().min(3).max(255),
@@ -9,7 +10,7 @@ export const createRestaurantSchema = z.object({
   email: z.string().email().optional(),
   website: z.string().url().optional(),
   openingHours: z.string().max(500).optional(),
-});
+}).strict();
 
 export const updateRestaurantSchema = z.object({
   name: z.string().min(2).max(150).optional(),
@@ -20,7 +21,7 @@ export const updateRestaurantSchema = z.object({
   email: z.string().email().optional(),
   website: z.string().url().optional(),
   openingHours: z.string().max(500).optional(),
-});
+}).strict();
 
 export const restaurantSearchSchema = z.object({
   search: z.string().trim().optional(),

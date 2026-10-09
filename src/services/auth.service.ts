@@ -63,7 +63,7 @@ export const loginUser = async (data: LoginInput) => {
     },
   });
 
-  if (!user || !user.isActive) {
+  if (!user || !user.isActive || !user.role.isActive) {
     throw new Error("INVALID_CREDENTIALS");
   }
 
@@ -103,7 +103,7 @@ export const getCurrentUser = async (userId: number) => {
     },
   });
 
-  if (!user || !user.isActive) {
+  if (!user || !user.isActive || !user.role.isActive) {
     throw new Error("USER_NOT_FOUND");
   }
 
