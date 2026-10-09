@@ -11,7 +11,24 @@ import moderationRoutes from "./routes/moderation.routes.js";
 
 const app = express();
 
-app.use(cors());
+const allowedOrigins = ["http://localhost:3000", "https://dinerate.xyz"];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+  }),
+);
 app.use(express.json());
 
 app.get("/api/health", (_req, res) => {
@@ -23,10 +40,7 @@ app.get("/api/health", (_req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/restaurants", restaurantRoutes);
-app.use(
-  "/api/restaurant-categories",
-  restaurantCategoryRoutes
-);
+app.use("/api/restaurant-categories", restaurantCategoryRoutes);
 app.use("/api/menu-categories", menuCategoryRoutes);
 app.use("/api/menu-items", menuItemRoutes);
 app.use("/api/rating-types", ratingTypeRoutes);
