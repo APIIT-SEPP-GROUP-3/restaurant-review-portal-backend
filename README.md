@@ -23,6 +23,10 @@ Before running the project, make sure the following are installed:
 
 ## Getting Started
 
+### Run with Docker (backend + database)
+
+For a step-by-step setup, sample data, API checks, and instructions to browse database tables, see the [Docker developer user guide](docs/docker-user-guide.md). Docker exposes the backend at `http://localhost:5001` and PostgreSQL at `localhost:5433`.
+
 ### 1. Clone the Repository
 
 ```bash
